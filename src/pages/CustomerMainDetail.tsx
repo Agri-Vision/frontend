@@ -9,7 +9,13 @@ import MapDashboard from "../compoenents/CustomerMailDetailPannel/MapDashboard";
 
 const CustomerMainDetail = () => {
 
-  return (
+return (
+  <>
+    <CssBaseline />
+    <Statistics />
+    <MapDashboard />
+  </>
+);
     <div>
       <CssBaseline />
 <Statistics/>
