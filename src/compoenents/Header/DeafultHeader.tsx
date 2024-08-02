@@ -97,7 +97,7 @@ export const DeafultHeader: FunctionComponent = (): ReactElement => {
                             flexGrow: 1
                         }}
                     >
-                        Logo
+                        AgriVision
                     </Typography>
                     {state.isAuthenticated && (
                         <ThemeProvider theme={profileMenuTheme}>

@@ -8,6 +8,7 @@ import { BaseLayout } from "../layouts/BaseLayout";
 import Example1 from "../pages/Example1";
 import { NotFoundPage } from "../pages/NotFound";
 import { Loading } from "../pages/Loading";
+import CustomerMainDetail from "../pages/CustomerMainDetail";
 
 const IndexRoutes: React.FC = () => {
     return (
@@ -18,6 +19,7 @@ const IndexRoutes: React.FC = () => {
                     {/* Example | */}
                     <Route path="example1" element={<Example1 />} />
                 </Route>
+                <Route path="/customerMainDetail" element={<CustomerMainDetail />} />
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/NotFoundPage" element={<NotFoundPage />} />
             </Routes>
