@@ -19,7 +19,7 @@ const IndexRoutes: React.FC = () => {
                     {/* Example | */}
                     <Route path="example1" element={<Example1 />} />
                 </Route>
-                <Route path="/customerMainDetail" element={<CustomerMainDetail />} />
+                <Route path="/customer-main-detail" element={<CustomerMainDetail />} />
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/NotFoundPage" element={<NotFoundPage />} />
             </Routes>
