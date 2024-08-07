@@ -5,6 +5,7 @@ import { SecureApp } from "@asgardeo/auth-react";
 
 import { BaseLayout } from "../layouts/BaseLayout";
 
+import CustomerMainDetail from "../pages/CustomerMainDetail";
 import Example1 from "../pages/Example1";
 import { NotFoundPage } from "../pages/NotFound";
 import { Loading } from "../pages/Loading";
@@ -15,8 +16,8 @@ const IndexRoutes: React.FC = () => {
             <Routes>
                 <Route path="/home" element={<BaseLayout />}>
                     <Route index element={<Navigate to="/home" />} />
-                    {/* Example | */}
-                    <Route path="example1" element={<Example1 />} />
+                    <Route path="customer-main-detail" element={<CustomerMainDetail />} />
+                    <Route path="example1" element={<Example1 />} />                    
                 </Route>
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/NotFoundPage" element={<NotFoundPage />} />
