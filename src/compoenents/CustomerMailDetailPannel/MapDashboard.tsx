@@ -44,8 +44,8 @@ const MapDashboard: React.FC = () => {
           <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
             <ComposableMap>
               <Geographies geography={geoUrl}>
-                {({ geographies: ExpectedType1 }) =>
-                  geographies.map((geo: ExpectedType2) => (
+                {({ geographies }) =>
+                  geographies.map((geo) => (
                     <Geography key={geo.rsmKey} geography={geo} style={{
                       default: { fill: "#D6D6DA" },
                       hover: { fill: "#F53" },

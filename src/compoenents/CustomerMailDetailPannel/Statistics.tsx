@@ -6,6 +6,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import AllInboxIcon from '@mui/icons-material/AllInbox';
 import UpdateIcon from '@mui/icons-material/Update';
 import PendingIcon from '@mui/icons-material/Pending';
+
 import '../../assets/styles/Statistics.css';
 
 
@@ -71,7 +72,7 @@ const Statistics: React.FC = () => {
   }
 
   return (
-    <div>
+    <>
       <Box className="dashboard-container">
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
@@ -116,7 +117,7 @@ const Statistics: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
-    </div>
+    </>
   );
 };
 

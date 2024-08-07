@@ -1,6 +1,3 @@
-import { useAuthContext } from "@asgardeo/auth-react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { CssBaseline } from '@mui/material';
 
 import Statistics from "../compoenents/CustomerMailDetailPannel/Statistics";
@@ -16,12 +13,6 @@ return (
     <MapDashboard />
   </>
 );
-    <div>
-      <CssBaseline />
-<Statistics/>
-<MapDashboard/>
-    </div>
-  );
 };
 
 export default CustomerMainDetail;
