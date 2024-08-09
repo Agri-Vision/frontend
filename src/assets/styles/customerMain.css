@@ -1,0 +1,38 @@
+/* Global styles */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* Ensure no overflow */
+  }
+
+.grid-container {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 20% 73%; /* Adjust these values as needed */
+    width: 100vw; /* Ensure it takes the full viewport width */
+   
+    
+  }
+  
+  .header {
+    grid-column: 1 / span 2;
+    border: px solid black;
+   margin: 5px;
+    text-align: center;
+  }
+  
+  .left-column {
+    border: px solid black;
+    
+    overflow: auto;
+  }
+  
+  .right-column {
+    border: px solid black;
+    
+    overflow: auto;
+  }
+  
