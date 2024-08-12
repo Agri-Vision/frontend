@@ -47,3 +47,9 @@ html, body, #root {
   overflow: auto;
 }
 
+.iot-History-Table {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+  padding: '20px'
+}
+
