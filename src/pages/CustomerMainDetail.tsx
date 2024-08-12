@@ -4,6 +4,7 @@ import Statistics from "../compoenents/CustomerMailDetailPannel/Statistics";
 import MapDashboard from "../compoenents/CustomerMailDetailPannel/MapDashboard";
 import LeftColumnBtn from "../compoenents/CustomerMailDetailPannel/LeftColumnBtn";
 import WeatherTab from "../compoenents/CustomerMailDetailPannel/WeatherTab";
+import IotDetailPannel from "../compoenents/CustomerMailDetailPannel/IotDetailPannel";
 
 const CustomerMainDetail = () => {
 
@@ -14,6 +15,7 @@ return (
       <div className="left-column"><LeftColumnBtn /></div>
       <div className="center-column"><MapDashboard /></div>
       <div className="right-column"><WeatherTab /></div>
+      <div className="iot-container" ><IotDetailPannel /></div>
     </div>
 );
 };

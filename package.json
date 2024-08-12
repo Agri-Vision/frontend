@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@amcharts/amcharts4": "^4.10.39",
+    "@amcharts/amcharts4-fonts": "^4.0.1",
+    "@amcharts/amcharts4-geodata": "^4.1.30",
     "@asgardeo/auth-react": "^5.0.0",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",

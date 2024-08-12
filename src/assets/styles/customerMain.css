@@ -41,3 +41,9 @@ html, body, #root {
   grid-column: 3;
   overflow: auto;
 }
+
+.iot-container {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+}
+
