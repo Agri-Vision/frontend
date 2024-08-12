@@ -6,6 +6,7 @@ import LeftColumnBtn from "../compoenents/CustomerMailDetailPannel/LeftColumnBtn
 import WeatherTab from "../compoenents/CustomerMailDetailPannel/WeatherTab";
 import IotDetailPannel from "../compoenents/CustomerMailDetailPannel/IotDetailPannel";
 import IoTHistoryTb from "../compoenents/CustomerMailDetailPannel/IoTHistoryTb";
+import YieldHistoryTb from "../compoenents/CustomerMailDetailPannel/YieldHistoryTb";
 
 const CustomerMainDetail = () => {
 
@@ -18,6 +19,7 @@ return (
       <div className="right-column"><WeatherTab /></div>
       <div className="iot-container" ><IotDetailPannel /></div>
       <div className="iot-History-Table" ><IoTHistoryTb /></div>
+      <div className="yield-History-Table" ><YieldHistoryTb /></div>
     </div>
 );
 };

@@ -12,7 +12,6 @@ html, body, #root {
   display: grid;
   grid-template-columns: 22% 56% 25%;  
   grid-template-rows: auto 1fr; /* Two rows: one for the header, the second for the columns */
-  height: 100vh; /* Full viewport height */
   width: 100%; /* Full viewport width */
   box-sizing: border-box;
 }
@@ -48,6 +47,12 @@ html, body, #root {
 }
 
 .iot-History-Table {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+  padding: '20px'
+}
+
+.yield-History-Table {
   grid-column: 1 / span 3; /* Span across all three columns */
   overflow: auto;
   padding: '20px'
