@@ -12,12 +12,16 @@ export const Loading: FunctionComponent = (): ReactElement => {
 
     return (
         <>
-            <section className="loading-body">
+            {/* <section className="loading-body">
                 <div className="loader">
                     <div className="inner-border"></div>
                 </div>
-            </section>
+            </section> */}
+            <div className="drone-loader">
+      <div className="drone"></div>
+    </div>
         </>
+
 
     );
 };
