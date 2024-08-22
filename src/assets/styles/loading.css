@@ -100,7 +100,7 @@
   .drone {
     width: 100px;
     height: 100px;
-    background-image: url('../img/drone.png');
+    background-image: url('../img/droneCol.png');
     background-size: contain;
     background-repeat: no-repeat;
     animation: rotateDrone 2s linear infinite;
