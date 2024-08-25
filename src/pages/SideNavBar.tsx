@@ -2,7 +2,7 @@ import { FunctionComponent, PropsWithChildren, ReactElement } from "react";
 
 // import MuiSideNav from "../components/SideNavBars/MuiSideNav";
 
-import ViewQuiltOutlinedIcon from '@mui/icons-material/ViewQuiltOutlined';
+import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import DraftsOutlinedIcon from '@mui/icons-material/DraftsOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
@@ -17,14 +17,14 @@ const SideNavBar: FunctionComponent<
 > = (): ReactElement => {
   const navItems = [
     {
-      icon: <ViewQuiltOutlinedIcon />,
-      label: "Example1",
-      link: "/home/example1",
+      icon: <GridViewOutlinedIcon />,
+      label: "Dashbord",
+      link: "/home/customer-main-detail"
     },
     {
       icon: <DraftsOutlinedIcon />,
-      label: "Example2",
-      link: "/home/example2",
+      label: "Example1",
+      link: "/home/example1",
     },
     {
       icon: <SendOutlinedIcon />,
@@ -42,7 +42,7 @@ const SideNavBar: FunctionComponent<
       link: "/home/example5",
     },
     {
-      icon: <ViewQuiltOutlinedIcon />,
+      icon: <DraftsOutlinedIcon />,
       label: "Example6",
       subItems: [
         {
@@ -61,7 +61,6 @@ const SideNavBar: FunctionComponent<
 
   return (
     <>
-      {/* <MuiSideNav items={navItems} /> */}
       <MuiExpandableSidebar items={navItems} />
 
     </>

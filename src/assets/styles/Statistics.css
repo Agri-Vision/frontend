@@ -1,0 +1,36 @@
+/* Statistics.css */
+
+.dashboard-container {
+    padding: 0px;
+  }
+  
+  .stats-card {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .icon-container .icon {
+    font-size: 40px;
+  }
+  
+  .value-container {
+    margin-left: 8px;
+  }
+  
+  .percentage-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: green;
+  }
+  
+  .percentage-container.decrease {
+    color: red;
+  }
+  
