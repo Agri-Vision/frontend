@@ -18,7 +18,6 @@ import {
     Theme,
     ThemeProvider,
     Toolbar,
-    Typography,
     useTheme
 } from "@mui/material";
 
