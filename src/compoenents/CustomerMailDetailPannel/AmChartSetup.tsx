@@ -6,7 +6,9 @@ export const createChart = (data: any[], chartId: string) => {
   chart.data = data;
 
   let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+  dateAxis.title.text = "Date";
   let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+  valueAxis.title.text = "Values";
 
   let series = chart.series.push(new am4charts.LineSeries());
   series.dataFields.valueY = "value"; // Dummy data uses "value" for the Y-axis

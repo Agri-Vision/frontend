@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box, Button, Grid, Paper, Typography } from '@mui/material';
 import '../../assets/styles/iotDetailPannel.css';
 import IoTCard from './IoTCard';
 

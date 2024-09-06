@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Grid, Paper, Typography } from '@mui/material';
 import '../../assets/styles/weatherTab.css';
 
 interface WeatherData {
