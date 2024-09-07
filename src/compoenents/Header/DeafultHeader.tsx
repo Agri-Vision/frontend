@@ -18,7 +18,6 @@ import {
     Theme,
     ThemeProvider,
     Toolbar,
-    Typography,
     useTheme
 } from "@mui/material";
 
@@ -89,16 +88,25 @@ export const DeafultHeader: FunctionComponent = (): ReactElement => {
                 position="fixed"
             >
                 <Toolbar>
-                    <Typography
-                        variant="h6"
-                        component="div"
-                        sx={{
-                            color: "black",
-                            flexGrow: 1
-                        }}
-                    >
-                        AgriVision
-                    </Typography>
+                <Box
+        sx={{
+            position: 'relative',
+                        top: 0,
+                        left: 0,
+                        padding: '10px',
+            flexGrow: 1,
+        }}
+    >
+        <img
+            src="../src/assets/img/webLogo.png"
+            alt="Web Logo"
+            style={{
+                height: '50px', 
+                objectFit: 'contain',
+            }}
+        />
+    </Box>
+
                     {state.isAuthenticated && (
                         <ThemeProvider theme={profileMenuTheme}>
                             <Box>

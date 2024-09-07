@@ -1,89 +1,182 @@
-import React from 'react';
-import { Box, Button, Grid, Paper, Typography } from '@mui/material';
-// import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+// version 5
 
-// const geoUrl =
-//   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
+import React, { useEffect, useRef } from 'react';
+ 
 
+declare global {
+  interface Window {
+    initMap: () => void;
+  }
+}
+ 
 const MapDashboard: React.FC = () => {
-
-  const googleMapsUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509906!2d144.9537363155046!3d-37.8162797420218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf57761c21b23e9b7!2sFederation%20Square!5e0!3m2!1sen!2sau!4v1616399354946!5m2!1sen!2sau";
-
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<any>(null); 
+ 
+  useEffect(() => {
+    const initMap = () => {
+      if (mapRef.current) {
+        const map = new window.google.maps.Map(mapRef.current, {
+          zoom: 23, // Initial zoom level
+          center: {
+            lat: (7.1947473 + 7.1942133) / 2,  // Center the map based on the overlay image bounds
+            lng: (80.5402994 + 80.5399448) / 2  
+          },
+          mapTypeId: "satellite",
+        });
+ 
+        
+        const center = map.getCenter();
+        if (center) {
+          const maxZoomService = new window.google.maps.MaxZoomService();
+          maxZoomService.getMaxZoomAtLatLng(center, (response) => {
+            if (response.status === 'OK') {
+              const maxZoomLevel = response.zoom + 2; // Extend beyond the max zoom level by 2
+              const customMapType = new window.google.maps.ImageMapType({
+                getTileUrl: function(coord, zoom) {
+                  return `http://mt.google.com/vt/lyrs=s&x=${coord.x}&y=${coord.y}&z=${zoom}`;
+                },
+                tileSize: new window.google.maps.Size(256, 256),
+                maxZoom: maxZoomLevel,  // Set max zoom level
+                name: 'Extended Zoom'
+              });
+ 
+              map.mapTypes.set('extended_zoom', customMapType);
+              map.setMapTypeId('extended_zoom'); 
+            }
+          });
+        }
+ 
+        
+        const bounds = new window.google.maps.LatLngBounds(
+          new window.google.maps.LatLng(7.1942133, 80.5399448), // Lower Left (lat, lng)
+          new window.google.maps.LatLng(7.1947473, 80.5402994)  // Upper Right (lat, lng)
+        );
+ 
+        const image = "../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png"; 
+ 
+        class CustomOverlay extends window.google.maps.OverlayView {
+          bounds: any;
+          image: string;
+          div: HTMLDivElement | null = null;
+ 
+          constructor(bounds: any, image: string) {
+            super();
+            this.bounds = bounds;
+            this.image = image;
+          }
+ 
+          onAdd() {
+            this.div = document.createElement("div");
+            this.div.style.borderStyle = "none";
+            this.div.style.borderWidth = "0px";
+            this.div.style.position = "absolute";
+ 
+            const img = document.createElement("img");
+ 
+            img.src = this.image;
+            img.style.width = "100%";
+            img.style.height = "100%";
+            img.style.position = "absolute";
+            this.div.appendChild(img);
+ 
+            const panes = this.getPanes();
+            if (panes && panes.overlayLayer) {
+              panes.overlayLayer.appendChild(this.div);
+            }
+          }
+ 
+          draw() {
+            if (!this.div) return;
+ 
+            const overlayProjection = this.getProjection();
+            const sw = overlayProjection.fromLatLngToDivPixel(
+              this.bounds.getSouthWest()
+            );
+            const ne = overlayProjection.fromLatLngToDivPixel(
+              this.bounds.getNorthEast()
+            );
+ 
+            if (sw && ne && this.div) {
+              this.div.style.left = `${sw.x}px`;
+              this.div.style.top = `${ne.y}px`;
+              this.div.style.width = `${ne.x - sw.x}px`;
+              this.div.style.height = `${sw.y - ne.y}px`;
+            }
+          }
+ 
+          hide() {
+            if (this.div) {
+              this.div.style.visibility = "hidden";
+            }
+          }
+ 
+          show() {
+            if (this.div) {
+              this.div.style.visibility = "visible";
+            }
+          }
+ 
+          toggle() {
+            if (this.div) {
+              if (this.div.style.visibility === "hidden") {
+                this.show();
+              } else {
+                this.hide();
+              }
+            }
+          }
+ 
+          toggleDOM(map: google.maps.Map) {
+            if (this.getMap()) {
+              this.setMap(null);
+            } else {
+              this.setMap(map);
+            }
+          }
+        }
+ 
+        const overlay = new CustomOverlay(bounds, image);
+        overlay.setMap(map);
+        overlayRef.current = overlay;
+ 
+        const toggleButton = document.createElement("button");
+        toggleButton.textContent = "Toggle";
+        toggleButton.classList.add("custom-map-control-button");
+ 
+        const toggleDOMButton = document.createElement("button");
+        toggleDOMButton.textContent = "Toggle DOM Attachment";
+        toggleDOMButton.classList.add("custom-map-control-button");
+ 
+        toggleButton.addEventListener("click", () => {
+          overlay.toggle();
+        });
+ 
+        toggleDOMButton.addEventListener("click", () => {
+          overlay.toggleDOM(map);
+        });
+ 
+        map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(toggleDOMButton);
+        map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
+      }
+    };
+ 
+    if (!window.google) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBKwT3-cq00IaM04TcHh1UiePAgjbp9LN4&callback=initMap`;
+      script.async = true;
+      document.head.appendChild(script);
+      window.initMap = initMap; // Assign initMap to the global window object
+    } else {
+      initMap();
+    }
+  }, []);
+ 
   return (
-    
-    // <Box p={3}>
-    //   <Grid container spacing={3}>
-    //     {/* Sidebar and Weather Information */}
-    //     <Grid item xs={12} md={3}>
-    //       <Grid container spacing={3}>
-    //         {/* Sidebar */}
-    //         <Grid item xs={12}>
-    //           <Paper elevation={3} sx={{ p: 2 }}>
-    //             <Button fullWidth variant="contained" color="primary" sx={{ mb: 2 }}>
-    //               Yield
-    //             </Button>
-    //             <Button fullWidth variant="contained" color="primary" sx={{ mb: 2 }}>
-    //               Stress
-    //             </Button>
-    //             <Button fullWidth variant="contained" color="primary">
-    //               Disease
-    //             </Button>
-    //           </Paper>
-    //         </Grid>
-    //         {/* Weather Information */}
-    //         <Grid item xs={12}>
-    //           <Paper elevation={3} sx={{ p: 2 }}>
-    //             <Typography variant="h6">Weather Information</Typography>
-    //             <Typography variant="body1">Mon, Jul 22</Typography>
-    //             <Typography variant="body2">Kotte</Typography>
-    //             <Typography variant="body2">Temperature: 31.7°C</Typography>
-    //             <Typography variant="body2">Humidity: 85%</Typography>
-    //           </Paper>
-    //         </Grid>
-    //       </Grid>
-    //     </Grid>
-
-    //     {/* Map */}
-    //     <Grid item xs={12} md={9}>
-    //       <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
-    //         <ComposableMap>
-    //           <Geographies geography={geoUrl}>
-    //             {({ geographies }) =>
-    //               geographies.map((geo) => (
-    //                 <Geography
-    //                   key={geo.rsmKey}
-    //                   geography={geo}
-    //                   style={{
-    //                     default: { fill: "#D6D6DA" },
-    //                     hover: { fill: "#F53" },
-    //                     pressed: { fill: "#E42" }
-    //                   }}
-    //                 />
-    //               ))
-    //             }
-    //           </Geographies>
-    //         </ComposableMap>
-    //       </Paper>
-    //     </Grid>
-    //   </Grid>
-    // </Box>
-<Grid container spacing={2}>
-      <Grid item xs={12} md={9}>
-        <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
-          <iframe
-            width="100%"
-            height="450"
-            style={{ border: 0 }}
-            loading="lazy"
-            allowFullScreen
-            src={googleMapsUrl}
-          ></iframe>
-        </Paper>
-      </Grid>
-    </Grid>
-
-
+    <div>
+      <div ref={mapRef} style={{ height: '100vh', width: '100%' }} />
+    </div>
   );
 };
-
+ 
 export default MapDashboard;

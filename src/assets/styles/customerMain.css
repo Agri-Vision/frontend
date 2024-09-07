@@ -1,38 +1,60 @@
 /* Global styles */
 html, body, #root {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden; /* Ensure no overflow */
-  }
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+}
 
 .grid-container {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    grid-template-columns: 20% 73%; /* Adjust these values as needed */
-    width: 100vw; /* Ensure it takes the full viewport width */
-   
-    
-  }
-  
-  .header {
-    grid-column: 1 / span 2;
-    border: px solid black;
-   margin: 5px;
-    text-align: center;
-  }
-  
-  .left-column {
-    border: px solid black;
-    
-    overflow: auto;
-  }
-  
-  .right-column {
-    border: px solid black;
-    
-    overflow: auto;
-  }
-  
+  display: grid;
+  grid-template-columns: 22% 56% 25%;  
+  grid-template-rows: auto 1fr; /* Two rows: one for the header, the second for the columns */
+  width: 100%; /* Full viewport width */
+  box-sizing: border-box;
+}
+
+.header {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  padding: 10px;
+  text-align: center;
+  background-color: #f9f9f9; /* Optional: Background color for the header */
+  border-bottom: px solid #ccc; /* Optional: Border to separate header from content */
+}
+
+.left-column {
+  grid-column: 1;
+  border-right: px solid #ccc; 
+  overflow: auto;
+}
+
+.center-column {
+  grid-column: 2;
+  border-right: px solid #ccc; 
+  overflow: auto;
+}
+
+.right-column {
+  grid-column: 3;
+  overflow: auto;
+}
+
+.iot-container {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+}
+
+.iot-History-Table {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+  padding: '20px'
+}
+
+.yield-History-Table {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+  padding: '20px'
+}
+
