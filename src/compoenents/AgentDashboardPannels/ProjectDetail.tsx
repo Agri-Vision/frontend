@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Grid, Paper, Checkbox, FormControlLabel, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 interface IoTDevice {
   id: string;
@@ -23,10 +24,41 @@ const ProjectDetail: React.FC = () => {
   const [iotDevices, setIoTDevices] = useState<IoTDevice[]>([{ id: '', latitude: '', longitude: '' }]);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
+  const categorizeImages = (images: File[]) => {
+    const categorizedImages: { [key: string]: File[] } = {
+      RGB: [],
+      R: [],
+      NIR: [],
+      RE: [],
+      G: []
+    };
+
+    images.forEach(image => {
+      const fileName = image.name.toUpperCase();
+      console.log('Image name for categorization:', fileName);
+
+      if (fileName.endsWith('_D.JPG')) {
+        categorizedImages.RGB.push(image);
+      } else if (fileName.endsWith('_MS_R.TIF')) {
+        categorizedImages.R.push(image);
+      } else if (fileName.endsWith('_MS_NIR.TIF')) {
+        categorizedImages.NIR.push(image);
+      } else if (fileName.endsWith('_MS_RE.TIF')) {
+        categorizedImages.RE.push(image);
+      } else if (fileName.endsWith('_MS_G.TIF')) {
+        categorizedImages.G.push(image);
+      }
+    });
+
+    console.log('Categorized Images:', categorizedImages);
+    return categorizedImages;
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
-      setUploadedImages([...uploadedImages, ...files]);
+      console.log('Uploaded images:', files.map(file => file.name));
+      setUploadedImages(prevImages => [...prevImages, ...files]);
     }
   };
 
@@ -37,7 +69,8 @@ const ProjectDetail: React.FC = () => {
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
-    setUploadedImages([...uploadedImages, ...files]);
+    console.log('Dropped images:', files.map(file => file.name));
+    setUploadedImages(prevImages => [...prevImages, ...files]);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -68,22 +101,89 @@ const ProjectDetail: React.FC = () => {
     setIsConfirmed(event.target.checked);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isConfirmed) {
       alert('Please confirm the details before submitting.');
       return;
     }
-    // Perform submit actions here
-    console.log('Submitting project details:', {
-      uploadedImages,
-      iotDevices,
-    });
+
+    try {
+      // Step 1: Obtain Authorization Token
+      const tokenResponse = await axios.post('http://localhost:8000/api/token-auth/', {
+        username: 'DinukaKariyawasam',
+        password: 'test'
+      });
+      const token = tokenResponse.data.token;
+
+      // Step 2: Create a New Project in WebODM
+      const projectResponse = await axios.post('http://localhost:8000/api/projects/', {
+        name: 'Hello WebODM!'
+      }, {
+        headers: {
+          Authorization: `JWT ${token}`
+        }
+      });
+      const newProjectId = projectResponse.data.id;
+
+      // Step 3: Categorize Images by Bands
+      const categorizedImages = categorizeImages(uploadedImages);
+
+      // Step 4: Create Tasks for Each Band of Images
+      const createTaskForBand = async (bandName: string, images: File[]) => {
+        if (images.length === 0) {
+          console.warn(`No images found for band: ${bandName}`);
+          return;
+        }
+
+        const formData = new FormData();
+        images.forEach((image) => {
+          formData.append('images', image, image.name);
+        });
+
+        // Add options to the formData
+        const options = JSON.stringify([
+          { "name": "orthophoto-resolution", "value": 2.0 },
+          { "name": "auto-boundary", "value": true },
+          { "name": "dsm", "value": true },
+          { "name": "pc-quality", "value": "high" },
+          { "name": "dem-resolution", "value": 2.0 }
+        ]);
+
+        formData.append('options', options);
+
+        try {
+          const taskResponse = await axios.post(`http://localhost:8000/api/projects/${newProjectId}/tasks/`, formData, {
+            headers: {
+              Authorization: `JWT ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          console.log(`Task created for band ${bandName}:`, taskResponse.data);
+        } catch (taskError) {
+          console.error(`Error creating task for band ${bandName}:`, taskError);
+        }
+      };
+
+      // Create Tasks for Each Band
+      await Promise.all([
+        createTaskForBand('RGB', categorizedImages.RGB),
+        createTaskForBand('R', categorizedImages.R),
+        createTaskForBand('NIR', categorizedImages.NIR),
+        createTaskForBand('RE', categorizedImages.RE),
+        createTaskForBand('G', categorizedImages.G),
+      ]);
+
+      alert('Project and tasks created successfully!');
+    } catch (error) {
+      console.error('Error creating project or tasks:', error);
+      alert('Failed to create project or tasks. Please try again.');
+    }
   };
 
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-         {projectDetails.name}
+        {projectDetails.name}
       </Typography>
 
       <Grid container spacing={3}>
@@ -110,7 +210,7 @@ const ProjectDetail: React.FC = () => {
 
         {/* Image Upload */}
         <Grid item xs={12}>
-          <Box 
+          <Box
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             sx={{
@@ -144,7 +244,7 @@ const ProjectDetail: React.FC = () => {
         <Grid item xs={12}>
           <Typography variant="h6" gutterBottom>IoT Devices</Typography>
           {iotDevices.map((device, index) => (
-            <Grid container spacing={2} key={index} sx={{ marginBottom: 2, alignItems: 'center', maxWidth: '1000px' }}>
+            <Grid container spacing={2} key={index} sx={{ marginBottom: 2, alignItems: 'center', maxWidth: '600px' }}>
               <Grid item xs={12} sm={3}>
                 <TextField
                   label="Device ID"
@@ -189,7 +289,12 @@ const ProjectDetail: React.FC = () => {
             control={<Checkbox checked={isConfirmed} onChange={handleConfirmChange} />}
             label="I confirm that all the details are correct"
           />
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={!isConfirmed} // Disable button when the checkbox is not checked
+          >
             Submit
           </Button>
         </Grid>
