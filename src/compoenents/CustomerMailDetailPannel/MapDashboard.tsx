@@ -1,8 +1,6 @@
 // version 5
-
 import React, { useEffect, useRef } from 'react';
  
-
 declare global {
   interface Window {
     initMap: () => void;
@@ -158,6 +156,42 @@ const MapDashboard: React.FC = () => {
  
         map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(toggleDOMButton);
         map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
+
+// -------------------------------------------Add a marker to show the iot device on the map----------------------------------------------------
+      // Add Marker for IoT device location
+        const markerPosition = {
+          lat: 7.1944800, // Latitude of IoT device
+          lng: 80.5401000 // Longitude of IoT device
+        };
+
+        // const marker = new window.google.maps.Marker({
+        //   position: markerPosition,
+        //   map,
+        //   title: "IoT Device Location"
+        // });
+
+
+        // adding custom Icon
+        const marker = new window.google.maps.Marker({
+          position: markerPosition,
+          map,
+          title: "IoT Device Location",
+          icon: {
+            url: "../src/assets/markers/iot-marker.png", // Custom icon file path
+            scaledSize: new window.google.maps.Size(40, 40), // size of the icon
+          }
+        });
+        
+
+        // InfoWindow for displaying details
+        const infoWindow = new window.google.maps.InfoWindow({
+          content: `<div><h3>IoT Device</h3><p>Location: (${markerPosition.lat}, ${markerPosition.lng})</p><p>Status: Active</p></div>`
+        });
+
+        // Add click event listener to the marker
+        marker.addListener("click", () => {
+          infoWindow.open(map, marker);
+        });
       }
     };
  
@@ -174,7 +208,7 @@ const MapDashboard: React.FC = () => {
  
   return (
     <div>
-      <div ref={mapRef} style={{ height: '100vh', width: '100%' }} />
+      <div ref={mapRef} style={{ height: '70vh', width: '100%' }} />
     </div>
   );
 };

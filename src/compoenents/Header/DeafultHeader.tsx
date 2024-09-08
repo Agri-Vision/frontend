@@ -1,5 +1,4 @@
 import React, { FunctionComponent, ReactElement } from "react";
-
 import { useAuthContext } from "@asgardeo/auth-react";
 
 import {

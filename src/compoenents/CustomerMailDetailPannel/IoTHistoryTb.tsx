@@ -1,77 +1,63 @@
-
 import React, { useEffect, useState } from 'react';
-import '../../assets/styles/ioTHistoryTb.css';
+import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 
-interface HistoryData {
-  name: string;
-  organization: string;
-  estate: string;
-  yieldStressDisease: string;
+interface IoTData {
+  id: number;
+  recordedDate: string;
+  temperature: string;
+  humidity: string;
+  uvLevel: string;
+  soilMoisture: string;
+  pressure: string;
+  altitude: string;
 }
 
 const IoTHistoryTb: React.FC = () => {
-  const [data, setData] = useState<HistoryData[]>([]);
+  const [data, setData] = useState<IoTData[]>([]);
+
+  // Using Vite environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    const dummyData: HistoryData[] = [
-      {
-        name: "John Doe",
-        organization: "AgriCorp",
-        estate: "North Field",
-        yieldStressDisease: "High, Low, Medium",
-      },
-      {
-        name: "Jane Smith",
-        organization: "Farmers Inc.",
-        estate: "West Field",
-        yieldStressDisease: "Medium, High, Low",
-      },
-      {
-        name: "Mike Johnson",
-        organization: "GreenFields",
-        estate: "South Field",
-        yieldStressDisease: "Low, Medium, High",
-      },
-      // dummy data 
-    ];
+    const fetchIoTData = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/iot`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result: IoTData[] = await response.json();
 
-    // Simulate fetching data from an API
-    setData(dummyData);
-  }, []);
+        // Sort the data by 'id' in descending order to get the latest records first
+        const sortedData = result.sort((a, b) => b.id - a.id);
+        setData(sortedData);
+      } catch (error) {
+        console.error('Error fetching IoT data:', error);
+      }
+    };
+
+    fetchIoTData();
+  }, [API_BASE_URL]);
+
+  // Define table columns
+  const columns = [
+    { label: 'Recorded Date', key: 'recordedDate' },
+    { label: 'Temperature', key: 'temperature' },
+    { label: 'Humidity', key: 'humidity' },
+    { label: 'UV Level', key: 'uvLevel' },
+    { label: 'Soil Moisture', key: 'soilMoisture' },
+    { label: 'Pressure', key: 'pressure' },
+    { label: 'Altitude', key: 'altitude' },
+  ];
+
+  // Handle row click (optional)
+  const handleRowClick = (rowData: IoTData) => {
+    console.log('Row clicked:', rowData);
+  };
 
   return (
     <div className="history-table-container">
       <h2>IOT History</h2>
-      <table className="history-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Temperature</th>
-            <th>Humidity</th>
-            <th>UV Level</th>
-            <th>Soil Moisture</th>
-            <th>Atmospheric Pressure</th>
-            <th>Altitude</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <td>{item.name}</td>
-              <td>{item.organization}</td>
-              <td>{item.estate}</td>
-              <td>{item.yieldStressDisease}</td>
-              <td>{item.name}</td>
-              <td>{item.name}</td>
-              <td>{item.name}</td>
-              <td>{item.name}</td>
-              <td><button className="view-button">View</button></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ReusableTable columns={columns} data={data} onRowClick={handleRowClick} recordsPerPage={5} />
     </div>
   );
 };

@@ -17,19 +17,19 @@
 }
 
 .control-button {
-  background-color: #579B7B;
+  background-color: #5c8843;
+  border-radius: 20px;
+  font-family: 'Nunito', 'Poppins', sans-serif; /* Use the imported font */
+  font-weight: 700; /* Adjust font weight as per the design */
   color: white;
-  padding: 15px;
-  border: none;
-  border-radius: 15px;
-  text-align: center;
-  font-size: 16px;
-  cursor: pointer;
-  height: 50px;
+  padding: 10px 20px;
+  text-transform: none; /* Remove default uppercase transform, if needed */
+  transition: background-color 0.3s ease;
 }
 
+/* Hover effect */
 .control-button:hover {
-  background-color: #45a049;
+  background-color: #061a29;
 }
 
 .info-container {
@@ -77,6 +77,12 @@
 
 .info-value {
   font-size: 24px;
+  font-weight: bold;
+  color: #383535;
+}
+
+.info-value-soil {
+  font-size: 21px;
   font-weight: bold;
   color: #383535;
 }

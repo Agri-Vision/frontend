@@ -1,15 +1,22 @@
 .weather-tab-container {
-  height: 540px; 
-  overflow-y: auto; 
+  height: 330px;
+  overflow-y: scroll;
   padding: 10px;
   background-color: #f7f9fc;
-  border-radius: 15px;
+  border-radius: 25px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
 }
 
-
 .weather-tab-container::-webkit-scrollbar {
-  width: 4px;
+  display: none; 
+}
+
+.weather-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .weather-tab-container::-webkit-scrollbar-track {
@@ -34,7 +41,6 @@
   scrollbar-width: thin; 
   scrollbar-color: #6c757d #f7f9fc; 
 }
-
 
 .weather-info-card {
   background-color: #fff;
@@ -80,3 +86,4 @@
   width: 50px;
   height: 50px;
 }
+

@@ -1,13 +1,10 @@
 import { FunctionComponent, PropsWithChildren, ReactElement } from "react";
-
 // import MuiSideNav from "../components/SideNavBars/MuiSideNav";
-
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import DraftsOutlinedIcon from '@mui/icons-material/DraftsOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-
 import MuiExpandableSidebar from "../compoenents/SideNavBars/MuiExpandableSidebar";
 
 interface SideNavBarPropsInterface { }
