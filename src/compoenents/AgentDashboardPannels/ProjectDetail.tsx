@@ -15,7 +15,7 @@ const ProjectDetail: React.FC = () => {
   const [projectDetails, setProjectDetails] = useState({
     name: 'Sample Plantation',
     owner: 'John Doe',
-    assignedDate: '10 Juli 2022',
+    assignedDate: '10 July 2022',
     instructions: 'Follow the protocol strictly and monitor daily.',
     images: ['/path/to/image1.jpg', '/path/to/image2.jpg'], // Example images
   });
@@ -23,6 +23,7 @@ const ProjectDetail: React.FC = () => {
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [iotDevices, setIoTDevices] = useState<IoTDevice[]>([{ id: '', latitude: '', longitude: '' }]);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const categorizeImages = (images: File[]) => {
     const categorizedImages: { [key: string]: File[] } = {
@@ -103,7 +104,7 @@ const ProjectDetail: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!isConfirmed) {
-      alert('Please confirm the details before submitting.');
+      setMessage({ type: 'error', text: 'Please confirm the details before submitting.' });
       return;
     }
 
@@ -117,7 +118,7 @@ const ProjectDetail: React.FC = () => {
 
       // Step 2: Create a New Project in WebODM
       const projectResponse = await axios.post('http://localhost:8000/api/projects/', {
-        name: 'Hello WebODM!'
+        name: projectDetails.name // Use the assignment project name
       }, {
         headers: {
           Authorization: `JWT ${token}`
@@ -130,8 +131,8 @@ const ProjectDetail: React.FC = () => {
 
       // Step 4: Create Tasks for Each Band of Images
       const createTaskForBand = async (bandName: string, images: File[]) => {
-        if (images.length === 0) {
-          console.warn(`No images found for band: ${bandName}`);
+        if (images.length < 3) {
+          console.warn(`Not enough images for band: ${bandName}`);
           return;
         }
 
@@ -159,8 +160,9 @@ const ProjectDetail: React.FC = () => {
             }
           });
           console.log(`Task created for band ${bandName}:`, taskResponse.data);
-        } catch (taskError) {
-          console.error(`Error creating task for band ${bandName}:`, taskError);
+        } catch (taskError: any) {  // Cast to 'any' to allow property access
+          console.error(`Error creating task for band ${bandName}:`, taskError.response ? taskError.response.data : taskError.message);
+          throw new Error(`Error creating task for band ${bandName}`);
         }
       };
 
@@ -173,10 +175,10 @@ const ProjectDetail: React.FC = () => {
         createTaskForBand('G', categorizedImages.G),
       ]);
 
-      alert('Project and tasks created successfully!');
-    } catch (error) {
-      console.error('Error creating project or tasks:', error);
-      alert('Failed to create project or tasks. Please try again.');
+      setMessage({ type: 'success', text: 'Project and tasks created successfully!' });
+    } catch (error: any) { // Cast to 'any' to allow property access
+      console.error('Error creating project or tasks:', error.message);
+      setMessage({ type: 'error', text: 'Failed to create project or tasks. Please try again.' });
     }
   };
 
@@ -185,6 +187,12 @@ const ProjectDetail: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         {projectDetails.name}
       </Typography>
+
+      {message && (
+        <Typography variant="body1" sx={{ color: message.type === 'success' ? 'green' : 'red', marginBottom: 2 }}>
+          {message.text}
+        </Typography>
+      )}
 
       <Grid container spacing={3}>
         {/* Project Info */}
@@ -217,6 +225,8 @@ const ProjectDetail: React.FC = () => {
               border: '2px dashed grey',
               padding: 3,
               textAlign: 'center',
+              maxHeight: '400px', // Limit height for scroll
+              overflowY: 'auto', // Enable vertical scroll
             }}
           >
             <Typography variant="body1">Drag & Drop to upload images or</Typography>
