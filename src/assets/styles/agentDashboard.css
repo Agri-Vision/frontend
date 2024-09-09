@@ -24,3 +24,11 @@ h1 {
   flex-wrap: wrap;
   justify-content: space-between;
 }
+
+/* .project-sections{
+  display: grid;
+  grid-template-columns: 22% 56% 25%;  
+  grid-template-rows: auto 1fr; 
+  width: 100%;
+  box-sizing: border-box;
+} */
