@@ -11,15 +11,15 @@ export const createChart = (data: any[], chartId: string) => {
   valueAxis.title.text = "Values";
 
   let series = chart.series.push(new am4charts.LineSeries());
-  series.dataFields.valueY = "value"; // Dummy data uses "value" for the Y-axis
-  series.dataFields.dateX = "date"; // Dummy data uses "date" for the X-axis
+  series.dataFields.valueY = "value"; 
+  series.dataFields.dateX = "date"; 
   series.tooltipText = "{value}";
 
   chart.cursor = new am4charts.XYCursor();
 
-  // Set up the scrollbar
+
   let scrollbarX = new am4charts.XYChartScrollbar();
-  scrollbarX.series.push(series); // Link the series to the scrollbar
+  scrollbarX.series.push(series); 
   chart.scrollbarX = scrollbarX;
 
   return chart;
