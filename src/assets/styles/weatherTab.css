@@ -1,89 +1,106 @@
 .weather-tab-container {
-  height: 330px;
-  overflow-y: scroll;
-  padding: 10px;
-  background-color: #FFFFFF;
-  border-radius: 25px;
-  box-shadow: 0 0px 0px #E0E0E0;
-  scrollbar-width: none; 
-  -ms-overflow-style: none; 
+  height: 300px;
+  padding: 5px;
+  background-color: #202020;
+  border-radius: 20px;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+  color: #fff;
 }
 
-.weather-tab-container::-webkit-scrollbar {
-  display: none; 
-}
-
-.weather-info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.weather-tab-container::-webkit-scrollbar-track {
-  background: #FFFFFF;
-  border-radius: 15px;
-}
-
-.weather-tab-container::-webkit-scrollbar-thumb {
-  background-color: #FFFFFF; 
-  border-radius: 15px;
-  border: 2px solid #FFFFFF; 
-}
-
-.weather-info-list {
-  display: flex;
-  flex-direction: column; 
-  gap: 10px; 
-}
-
-/* For Firefox */
-.weather-tab-container {
-  scrollbar-width: thin; 
-  scrollbar-color: #6c757d #FFFFFF; 
+.weather-heading {
+  font-family: 'Nunito, Poppins, sans-serif';
+  text-transform: capitalize;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 5px;
 }
 
 .weather-info-card {
-  background-color: #fff;
-  border-radius: 15px;
-  padding: 10px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background-color: #2d2d2d;
+  border-radius: 20px;
+  padding: 0px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.weather-info-card h3 {
+.weather-info-card .temperature {
+  font-size: 40px;
+  color: #fff;
+}
+
+.weather-info-card .feels-like {
+  font-size: 16px;
+  color: #d3d3d3;
+}
+
+.weather-info-card .date {
   font-size: 14px;
-  color: #6c757d;
-  margin-bottom: 20px;
+  color: #b0b0b0;
 }
 
-.weather-content {
+.weather-info-card .description {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f1c40f;
+}
+
+.weather-icons-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .weather-details {
-  color: #333333;
-  flex-grow: 1;
+  text-align: right;
 }
 
-.weather-details p {
-  margin: 5px 0;
+.weather-details .humidity,
+.weather-details .wind {
+  font-size: 16px;
+  margin: 0px 0;
+  display: flex;
+  align-items: center;
 }
 
-.weather-details strong {
-  color: #333333;
-}
-
-.weather-icon {
-  flex-shrink: 0;
-  margin-left: 10px;
+.weather-details .humidity svg,
+.weather-details .wind svg {
+  margin-right: 5px;
 }
 
 .weather-icon img {
   width: 50px;
   height: 50px;
+  margin-bottom: 10px;
+}
+
+/* Apply this to your weatherTab.css or directly inline in the sx prop for Box */
+.weather-scroll-container {
+  height: 330px;
+  overflow-y: scroll;
+  padding: 20px;
+}
+
+/* Style the scrollbar */
+.weather-scroll-container::-webkit-scrollbar {
+  width: 6px; /* Thin scrollbar width */
+}
+
+.weather-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Scrollbar track background */
+}
+
+.weather-scroll-container::-webkit-scrollbar-thumb {
+  background: #888; /* Scrollbar thumb color */
+  border-radius: 10px; /* Rounded scrollbar */
+}
+
+.weather-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker color on hover */
+}
+
+/* Firefox */
+.weather-scroll-container {
+  scrollbar-width: thin; /* Thin scrollbar for Firefox */
+  scrollbar-color: #888 #f1f1f1; /* Thumb and track colors for Firefox */
 }
 

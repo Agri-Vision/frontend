@@ -52,11 +52,11 @@
 }
 
 .highlight-temperature {
-  background-color: #D1E8FF;
+  background-color: #DAF5DB;
 }
 
 .highlight-humidity {
-  background-color: #FFF7DB;
+  background-color: #DAF5DB;
 }
 
 .highlight-soil {
@@ -64,32 +64,35 @@
 }
 
 .highlight-uv {
-  background-color: #FAE9E8;
+  background-color: #DAF5DB;
 }
 
 .highlight-pressure {
-  background-color: #F2ECF7;
+  background-color: #DAF5DB;
 }
 
 .highlight-altitude {
-  background-color: #D4F1F4;
+  background-color: #DAF5DB;
 }
 
 .info-value {
   font-size: 24px;
   font-weight: bold;
-  color: #061a29;
+  color: #5d6063;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .info-value-soil {
   font-size: 21px;
   font-weight: bold;
-  color: #061a29;
+  color: #5d6063;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .info-label {
-  font-size: 14px;
-  color: #061a29;
+  font-size: 12px;
+  color: #5D6965;
+  font-family:sans-serif;
 }
 
 .real-time-text {
