@@ -17,19 +17,19 @@
 }
 
 .control-button {
-  background-color: #579B7B;
+  background-color: #5c8843;
+  border-radius: 20px;
+  font-family: 'Nunito', 'Poppins', sans-serif; /* Use the imported font */
+  font-weight: 700; /* Adjust font weight as per the design */
   color: white;
-  padding: 15px;
-  border: none;
-  border-radius: 15px;
-  text-align: center;
-  font-size: 16px;
-  cursor: pointer;
-  height: 50px;
+  padding: 10px 20px;
+  text-transform: none; /* Remove default uppercase transform, if needed */
+  transition: background-color 0.3s ease;
 }
 
+/* Hover effect */
 .control-button:hover {
-  background-color: #45a049;
+  background-color: #061a29;
 }
 
 .info-container {
@@ -52,38 +52,47 @@
 }
 
 .highlight-temperature {
-  background-color: #a6a6ec;
+  background-color: #DAF5DB;
 }
 
 .highlight-humidity {
-  background-color: #f8e8c2;
+  background-color: #DAF5DB;
 }
 
 .highlight-soil {
-  background-color: #9cdfbd;
+  background-color: #DAF5DB;
 }
 
 .highlight-uv {
-  background-color: #e7d6d0;
+  background-color: #DAF5DB;
 }
 
 .highlight-pressure {
-  background-color: #e8f5e9;
+  background-color: #DAF5DB;
 }
 
 .highlight-altitude {
-  background-color: #f3e5f5;
+  background-color: #DAF5DB;
 }
 
 .info-value {
   font-size: 24px;
   font-weight: bold;
-  color: #383535;
+  color: #5d6063;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.info-value-soil {
+  font-size: 21px;
+  font-weight: bold;
+  color: #5d6063;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .info-label {
-  font-size: 14px;
-  color: #000000;
+  font-size: 12px;
+  color: #5D6965;
+  font-family:sans-serif;
 }
 
 .real-time-text {
