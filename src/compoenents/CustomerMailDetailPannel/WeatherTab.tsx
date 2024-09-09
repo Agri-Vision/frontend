@@ -55,7 +55,21 @@ const WeatherTab: React.FC = () => {
 
   return (
     <div className="weather-tab-container">
-      <Typography variant="h6" align="center" gutterBottom className="weather-tab-title">WEATHER INFORMATION</Typography>
+      <Typography
+                variant="h6"
+                align="center"
+                gutterBottom
+                sx={{
+                  fontFamily: 'Nunito, Poppins, sans-serif',
+                  textTransform: 'capitalize',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  color: '#5c8843'
+                }}
+              >
+              WEATHER INFORMATION
+      </Typography>
+      
 
       <div className="weather-info-list">
         {weatherData.map((weather, index) => (

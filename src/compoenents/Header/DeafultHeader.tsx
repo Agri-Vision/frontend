@@ -89,11 +89,13 @@ export const DeafultHeader: FunctionComponent = (): ReactElement => {
                 <Toolbar>
                 <Box
         sx={{
-            position: 'relative',
-                        top: 0,
-                        left: 0,
-                        padding: '10px',
-            flexGrow: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            padding: '10px', // Add padding to ensure the logo is not stuck to the edge
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%' // Ensure it stays aligned vertically in the toolbar
         }}
     >
         <img
@@ -105,6 +107,9 @@ export const DeafultHeader: FunctionComponent = (): ReactElement => {
             }}
         />
     </Box>
+
+            {/* Flex-grow ensures the items align on the right */}
+            <Box sx={{ flexGrow: 1 }} />
 
                     {state.isAuthenticated && (
                         <ThemeProvider theme={profileMenuTheme}>

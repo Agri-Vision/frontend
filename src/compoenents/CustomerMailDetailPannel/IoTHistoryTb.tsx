@@ -21,7 +21,7 @@ const IoTHistoryTb: React.FC = () => {
   useEffect(() => {
     const fetchIoTData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/iot`);
+        const response = await fetch(`${API_BASE_URL}/iot/get_enviroment_data`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

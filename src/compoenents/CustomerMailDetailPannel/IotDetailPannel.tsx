@@ -45,7 +45,7 @@ const IotDetailPannel: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/iot`);
+        const response = await fetch(`${API_BASE_URL}/iot/get_enviroment_data`);
         const result = await response.json();
 
         console.log("Fetched API Data:", result);

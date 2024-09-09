@@ -82,7 +82,7 @@ const Statistics: React.FC = () => {
               percentage={data.totalUsersChange}
               isIncrease={data.totalUsersChange >= 0}
               icon={<PeopleIcon />}
-              bgColor="#f0f4ff"  // Custom background color
+              bgColor="#E4F1E3"  // Custom background color
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -92,7 +92,7 @@ const Statistics: React.FC = () => {
               percentage={data.totalProjectsChange}
               isIncrease={data.totalProjectsChange >= 0}
               icon={<AllInboxIcon />}
-              bgColor="#fff9eb"  // Custom background color
+              bgColor="#FFFBEF"  // Custom background color
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -102,7 +102,7 @@ const Statistics: React.FC = () => {
               percentage={data.updatedProjectsChange}
               isIncrease={data.updatedProjectsChange >= 0}
               icon={<UpdateIcon />}
-              bgColor="#eafff5"  // Custom background color
+              bgColor="#E0F7E0"  // Custom background color
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -112,7 +112,7 @@ const Statistics: React.FC = () => {
               percentage={data.totalPendingChange}
               isIncrease={data.totalPendingChange >= 0}
               icon={<PendingIcon />}
-              bgColor="#fff4f4"  // Custom background color
+              bgColor="#FBE6E6"  // Custom background color
             />
           </Grid>
         </Grid>

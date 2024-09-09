@@ -14,19 +14,47 @@ const MapController: React.FC = () => {
   };
 
   return (
-    <Card elevation={1} sx={{ maxWidth: 300, mx: 'auto', mt: 3, backgroundColor: '#f7f9fc', borderRadius: '12px' }}>
+    <Card elevation={1} sx={{ maxWidth: 300, mx: 'auto', mt: 3, backgroundColor: '#FFFFFF', borderRadius: '12px' }}>
       <CardContent>
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           
           {/* Header spanning two columns */}
           <Grid item xs={12}>
-            <Typography variant="h6" align="center" gutterBottom>
-              Map Controllers
+            <Typography
+              variant="h6"
+              align="center"
+              gutterBottom
+              sx={{
+                fontFamily: 'Nunito, Poppins, sans-serif',
+                textTransform: 'capitalize',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                color: '#5c8843'
+              }}
+            >
+              MAP CONTROLLERS
             </Typography>
           </Grid>
           
-          {/* First column: Map Type selection Dropdown */}
-          <Grid item xs={6}>
+          {/* Map Type Label and Selection in the same line */}
+          <Grid item xs={4}>
+            <Typography
+              variant="h6"
+              align="left"
+              sx={{
+                fontFamily: 'Poppins, sans-serif',
+                textTransform: 'capitalize',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#5D6965',
+                display: 'inline-block'
+              }}
+            >
+              MAP TYPE
+            </Typography>
+          </Grid>
+
+          <Grid item xs={8}>
             <FormControl variant="outlined" size="small" fullWidth>
               <InputLabel id="map-type-label">Select Map</InputLabel>
               <Select
@@ -35,19 +63,46 @@ const MapController: React.FC = () => {
                 onChange={handleMapChange}
                 label="Map Type"
               >
+                <MenuItem value=""></MenuItem>
                 <MenuItem value="drone">Drone Map</MenuItem>
+                <MenuItem value="satellite">NDVI Map</MenuItem>
+                <MenuItem value="satellite">RENDVI Map</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           
-          {/* Second column: IoT Devices Toggle */}
-          <Grid item xs={6}>
+          {/* IoT Devices Label and Toggle */}
+          <Grid item xs={12}>
             <FormControlLabel
-              control={<Switch checked={iotEnabled} onChange={handleIotToggle} color="warning" />}
-              label="IoT Devices"
+              control={
+                <Switch
+                  checked={iotEnabled}
+                  onChange={handleIotToggle}
+                  color="warning"
+                  size="small"
+                  sx={{ pl: 1, m: 1 }} // Adds padding and margin to the switch
+                />
+              }
+              label={
+                <Typography
+                  variant="h6"
+                  align="left"
+                  sx={{
+                    fontFamily: 'Poppins, sans-serif',
+                    textTransform: 'capitalize',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    color: '#5D6965'
+                  }}
+                >
+                  IOT DEVICES
+                </Typography>
+              }
               labelPlacement="start"
+              sx={{ justifyContent: 'space-between', ml: 0 }}
             />
           </Grid>
+
         </Grid>
       </CardContent>
     </Card>

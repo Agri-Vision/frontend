@@ -15,7 +15,7 @@ const LeftColumnBtn: React.FC = () => {
   const [iotData, setIotData] = useState<IoTData | null>(null);
 
   // Updated API endpoint
-  const API_BASE_URL = 'https://iot.gsentry.lk/get_enviroment_data';
+  const API_BASE_URL = 'http://localhost:8070/iot/get_enviroment_data';
 
   // Function to fetch the latest IoT data
   const fetchIoTData = async () => {
