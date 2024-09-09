@@ -19,8 +19,8 @@ const Statistics: React.FC = () => {
     const [metrics, setMetrics] = useState({
         totalUser: { value: '1,689', change: '8.5% Up from last Project', positive: true },
         totalProjects: { value: '10,293', change: '1.3% Up from last Project', positive: true },
-        updatedProjects: { value: '5', change: '1 Down', positive: false },
-        totalPending: { value: '25', change: 'Days Remaining', positive: true },
+        updatedProjects: { value: '1', change: '1 Device', positive: true },
+        totalPending: { value: '25', change: 'Days Remaining', positive: false },
     });
 
     useEffect(() => {
