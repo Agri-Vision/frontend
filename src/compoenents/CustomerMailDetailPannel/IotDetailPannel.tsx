@@ -27,14 +27,14 @@ const groupDataByTime = (data: any[], intervalMinutes: number) => {
 };
 
 interface IoTData {
-  recordedDate: string;
-  recordedTime: string;
-  temperature?: number;
-  humidity?: number;
-  altitude?: number;
-  pressure?: number;
-  soilMoisture?: number;
-  uvLevel?: number;
+  recorded_date: string;
+  recorded_time: string;
+  temperature?: string;
+  humidity?: string;
+  altitude?: string;
+  pressure?: string;
+  soilMoisture?: string;
+  uvLevel?: string;
 }
 
 const IotDetailPannel: React.FC = () => {
@@ -58,14 +58,15 @@ const IotDetailPannel: React.FC = () => {
     fetchData();
   }, [API_BASE_URL]);
 
-  // Generic function to filter data based on the field name (e.g., temperature, humidity, etc.)
+  // Convert string values to numbers and filter data based on the field name (e.g., temperature, humidity, etc.)
   const getFilteredData = (key: keyof IoTData, intervalMinutes: number = 60) => {
     const filteredData = iotData
       .filter(item => item[key] !== undefined) // Check if the key exists
       .map(item => ({
-        date: `${item.recordedDate}T${item.recordedTime}`, // Combine date and time
-        value: item[key] as number // Use the key to access the value dynamically
-      }));
+        date: `${item.recorded_date}T${item.recorded_time}`, // Combine date and time
+        value: parseFloat(item[key] as string) // Convert the string value to a number
+      }))
+      .filter(item => !isNaN(item.value)); // Filter out invalid values
 
     // Group the filtered data by the specified time interval (e.g., every 60 minutes)
     const groupedData = groupDataByTime(filteredData, intervalMinutes);
@@ -77,7 +78,7 @@ const IotDetailPannel: React.FC = () => {
 
   return (
     <div className="iot-row">
-      <IoTCard title="Temperature" data={getFilteredData('temperature', 60)} />  {/* Every 60 minutes */}
+      <IoTCard title="Temperature" data={getFilteredData('temperature', 60)} />  
       <IoTCard title="Humidity" data={getFilteredData('humidity', 60)} />
       <IoTCard title="Soil Moisture" data={getFilteredData('soilMoisture', 60)} />
       <IoTCard title="UV Level" data={getFilteredData('uvLevel', 60)} />

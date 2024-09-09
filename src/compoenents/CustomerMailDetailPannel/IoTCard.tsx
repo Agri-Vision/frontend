@@ -4,7 +4,7 @@ import { createChart } from './AmChartSetup'; // This will be a helper function 
 
 interface IoTCardProps {
   title: string;
-  data: { date: string, value: number }[]; // Define the correct structure for data
+  data: { date: string, value: number }[]; 
 }
 
 const IoTCard: React.FC<IoTCardProps> = ({ title, data }) => {

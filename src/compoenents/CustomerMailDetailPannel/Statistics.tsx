@@ -44,7 +44,7 @@ const Statistics: React.FC = () => {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2}>
-                {/* Static Card for Total Users */}
+               
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
                         <Avatar sx={{ bgcolor: metrics.totalUser.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
@@ -74,7 +74,7 @@ const Statistics: React.FC = () => {
                     </Paper>
                 </Grid>
 
-                {/* Static Card for Total Projects */}
+              
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
                         <Avatar sx={{ bgcolor: metrics.totalProjects.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
@@ -96,7 +96,7 @@ const Statistics: React.FC = () => {
                                 fontSize: '16px',
                                 color: '#5D6965',
                             }} variant="h6">
-                                Estimated Yield
+                                Estimated Yield (Kg)
                             </Typography>
                             <Typography variant="body2" sx={{ color: metrics.totalProjects.positive ? 'green' : 'red', marginTop: 1 }}>
                                 {metrics.totalProjects.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.totalProjects.change}
@@ -105,7 +105,7 @@ const Statistics: React.FC = () => {
                     </Paper>
                 </Grid>
 
-                {/* Static Card for Updated Projects */}
+              
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
                         <Avatar sx={{ bgcolor: metrics.updatedProjects.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
@@ -136,7 +136,7 @@ const Statistics: React.FC = () => {
                     </Paper>
                 </Grid>
 
-                {/* Static Card for Total Pending */}
+               
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
                         <Avatar sx={{ bgcolor: metrics.totalPending.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
