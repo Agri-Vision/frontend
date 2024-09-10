@@ -215,7 +215,7 @@
  
 // export default MapDashboard;
 import React, { useEffect, useRef } from 'react';
-import { useButtonContext } from '../ButtonContext'; // For Stress toggle context
+import { useButtonContext } from '../ButtonContext'; // For Stress, Yield, and Disease toggle context
 import { useIoTContext } from '../IoTContext'; // For IoT toggle context
 import { useMapTypeContext } from '../MapTypeContext'; // For MapTypeContext
 
@@ -230,7 +230,7 @@ const MapDashboard: React.FC = () => {
   const markerRef = useRef<any>(null);  // Store the marker reference
   const overlayRef = useRef<any>(null);
 
-  const { isStressActive } = useButtonContext(); // Access stress state from context
+  const { isStressActive, isDiseaseActive, isYieldActive } = useButtonContext(); // Access stress, yield, and disease state from context
   const { iotEnabled } = useIoTContext(); // Access IoT marker toggle state
   const { mapType } = useMapTypeContext(); // Access map type from context
 
@@ -238,12 +238,19 @@ const MapDashboard: React.FC = () => {
   const getImagePath = () => {
     switch (mapType) {
       case 'ndvi':
-        return '../src/assets/maps/ndvi_map_overlay.png';
+        return '../src/assets/maps/NDVI_map.png';
       case 'rendvi':
-        return '../src/assets/maps/ndvi_map_overlayrendvi.png';
+        return '../src/assets/maps/RENDVI_map.png';
       default:
         return '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png';
     }
+  };
+
+  // Function to determine yield color intensity
+  const getYieldColor = (yieldValue: number) => {
+    const normalizedValue = Math.min(Math.max(yieldValue, 0), 30); // Cap the value between 0 and 30
+    const intensity = Math.floor((normalizedValue / 30) * 255);
+    return `rgba(0, ${intensity}, 0, 0.6)`; // Green with varying intensity
   };
 
   useEffect(() => {
@@ -369,10 +376,10 @@ const MapDashboard: React.FC = () => {
           ['Yeild- 0 ,Stress- 0, Disease- 0', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 10 ,Stress- no, Disease- no', 'Yeild- 0 ,Stress- no, Disease- no'],
           ['Yeild- 5 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- Yes', 'Yeild- 30 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
           ['Yeild- 5 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
+          ['Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- Yes', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
         ];
 
-        // Grid overlay with hover and stress logic
+        // Grid overlay with hover, stress, yield, and disease logic
         class GridOverlay extends window.google.maps.OverlayView {
           div: HTMLDivElement | null = null;
           bounds: any;
@@ -407,10 +414,23 @@ const MapDashboard: React.FC = () => {
 
                 const blockValue = blockValues[i][j];
                 const isStress = blockValue.includes('Stress- Yes');
+                const isDisease = blockValue.includes('Disease- Yes');
+                const yieldMatch = blockValue.match(/Yeild- (\d+)/);
+                const yieldValue = yieldMatch ? parseInt(yieldMatch[1], 10) : 0;
 
                 // If stress is active and the block contains "Stress- Yes", set the background to red
                 if (isStressActive && isStress) {
                   block.style.backgroundColor = 'rgba(255, 0, 0, 0.2)'; // Highlight red for stress
+                }
+
+                // If disease is active, highlight in light brown
+                if (isDiseaseActive && isDisease) {
+                  block.style.backgroundColor = 'rgba(105, 0, 0, 0.4)'; // Light brown for disease
+                }
+
+                // If yield is active, adjust the color intensity based on the yield value
+                if (isYieldActive) {
+                  block.style.backgroundColor = getYieldColor(yieldValue);
                 }
 
                 block.style.display = 'flex';
@@ -421,7 +441,6 @@ const MapDashboard: React.FC = () => {
 
                 // Add hover effects for background color and text
                 block.onmouseover = () => {
-                  // Only change hover background color if it's not red (i.e., not stressed)
                   if (!isStressActive || !isStress) {
                     block.style.backgroundColor = 'rgba(222, 242, 211, 0.4)'; // Highlight color on hover
                   }
@@ -430,8 +449,7 @@ const MapDashboard: React.FC = () => {
                 };
 
                 block.onmouseout = () => {
-                  // If the block is stressed, keep it red; otherwise, make it transparent
-                  block.style.backgroundColor = isStressActive && isStress ? 'rgba(255, 0, 0, 0.2)' : 'transparent';
+                  block.style.backgroundColor = isStressActive && isStress ? 'rgba(255, 0, 0, 0.2)' : isYieldActive ? getYieldColor(yieldValue) : 'transparent';
                   block.style.color = 'transparent'; // Hide text again
                   block.textContent = ''; // Clear the text content
                 };
@@ -471,7 +489,7 @@ const MapDashboard: React.FC = () => {
     } else {
       initMap();
     }
-  }, [isStressActive, iotEnabled, mapType]); // Re-run when isStressActive, iotEnabled, or mapType changes
+  }, [isStressActive, isDiseaseActive, isYieldActive, iotEnabled, mapType]); // Re-run when any of the states change
 
   // Update IoT marker visibility when iotEnabled changes
   useEffect(() => {
@@ -488,4 +506,5 @@ const MapDashboard: React.FC = () => {
 };
 
 export default MapDashboard;
+
 

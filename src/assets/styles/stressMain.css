@@ -1,0 +1,68 @@
+/* Global styles */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 22% 56% 25%;  
+  grid-template-rows: auto 1fr; /* Two rows: one for the header, the second for the columns */
+  width: 100%; /* Full viewport width */
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.header {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  padding: 10px;
+  text-align: center;
+  background-color: #f9f9f9; /* Optional: Background color for the header */
+  border-bottom: px solid #ccc; /* Optional: Border to separate header from content */
+}
+
+.left-column {
+  grid-column: 1;
+  border-right: px solid #ccc; 
+  overflow: auto;
+}
+
+.center-column {
+  grid-column: 2;
+  border-right: px solid #ccc; 
+  overflow: auto;
+}
+
+.right-column {
+  grid-column: 3;
+  overflow: auto;
+}
+
+.iot-container {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+}
+
+.stress-Table {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+  padding: '20px'
+}
+
+.yield-History-Table {
+  grid-column: 1 / span 3; /* Span across all three columns */
+  overflow: auto;
+  padding: '20px'
+}
+
+.css-t5eqtr {
+  padding-left: 0;
+  padding-right: 10px;
+}

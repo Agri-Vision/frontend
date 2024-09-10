@@ -7,6 +7,9 @@ import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 // import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MuiExpandableSidebar from "../compoenents/SideNavBars/MuiExpandableSidebar";
 import HomeIcon from '@mui/icons-material/Home';
+import GrassIcon from '@mui/icons-material/Grass';
+import SpaIcon from '@mui/icons-material/Spa';
+import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 
 interface SideNavBarPropsInterface { }
 
@@ -24,21 +27,21 @@ const SideNavBar: FunctionComponent<
       label: "Dashbord",
       link: "/home/customer-main-detail",
     },
-    // {
-    //   icon: <SendOutlinedIcon />,
-    //   label: "Example3",
-    //   link: "/home/example3",
-    // },
-    // {
-    //   icon: <StarBorderOutlinedIcon />,
-    //   label: "Example4",
-    //   link: "/home/example4",
-    // },
-    // {
-    //   icon: <DeleteOutlinedIcon />,
-    //   label: "Example5",
-    //   link: "/home/example5",
-    // },
+    {
+      icon: <SpaIcon />,
+      label: "Yeild Dashboard",
+      link: "/home/yeild-dashboard",
+    },
+    {
+      icon: <GrassIcon />,
+      label: "Stress Dashboard",
+      link: "/home/stress-dashboard",
+    },
+    {
+      icon: <CoronavirusIcon />,
+      label: "Disease Dashboard",
+      link: "/home/disease-dashboard",
+    },
     // {
     //   icon: <DraftsOutlinedIcon />,
     //   label: "Example6",
