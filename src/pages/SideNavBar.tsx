@@ -24,7 +24,7 @@ const SideNavBar: FunctionComponent<
     },
     {
       icon: <GridViewOutlinedIcon />,
-      label: "Dashbord",
+      label: "Dashboard",
       link: "/home/customer-main-detail",
     },
     {
