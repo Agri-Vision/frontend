@@ -111,8 +111,8 @@ const ProjectDetail: React.FC = () => {
     try {
       // Step 1: Obtain Authorization Token
       const tokenResponse = await axios.post('http://localhost:8000/api/token-auth/', {
-        username: 'DinukaKariyawasam',
-        password: 'test'
+        username: 'prathila01@gmail.com',
+        password: '12345678'
       });
       const token = tokenResponse.data.token;
 
