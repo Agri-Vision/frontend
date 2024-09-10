@@ -238,9 +238,9 @@ const MapDashboard: React.FC = () => {
   const getImagePath = () => {
     switch (mapType) {
       case 'ndvi':
-        return '../src/assets/maps/ndvi_map_overlay.png';
+        return '../src/assets/maps/NDVI_map.png';
       case 'rendvi':
-        return '../src/assets/maps/rendvi_map_overlay.png';
+        return '../src/assets/maps/RENDVI_map.png';
       default:
         return '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png';
     }
@@ -373,10 +373,10 @@ const MapDashboard: React.FC = () => {
 
         // Array of values for each grid block
         const blockValues = [
-          ['Yeild- 0 ,Stress- 0, Disease- 0', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 10 ,Stress- no, Disease- no', 'Yeild- 0 ,Stress- no, Disease- no'],
-          ['Yeild- 5 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- Yes', 'Yeild- 30 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 5 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- Yes', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
+          ['B01 Yeild- 0', 'B02 Yeild- 20', 'B03 Yeild- 10', 'B04 Yeild- 0'],
+          ['B05 Yeild- 5 ', 'B06 Yeild- 20', 'B07 Yeild- 30 ', 'B08 Yeild- 20 '],
+          ['B09 Yeild- 5 ', 'B10 Yeild- 20 ', 'B11 Yeild- 20 ', 'B12 Yeild- 20 '],
+          ['B13 Yeild- 20 ', 'B14 Yeild- 20 ', 'B15 Yeild- 20 ', 'B16 Yeild- 20 '],
         ];
 
         // Grid overlay with hover, stress, yield, and disease logic

@@ -8,9 +8,7 @@ interface IoTData {
   temperature: string;
   humidity: string;
   uvLevel: string;
-  soilMoisture: string;
-  pressure: string;
-  altitude: string;
+  diseaseVulnerability: string; // To store disease vulnerability from second API
 }
 
 const DiseaseTb: React.FC = () => {
@@ -18,67 +16,67 @@ const DiseaseTb: React.FC = () => {
   const [selectedData, setSelectedData] = useState<IoTData | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const TILE_API_URL = 'http://localhost:8080/project/tiles';
+  const PREDICTION_API_URL = (tileId: number) => `http://localhost:8080/prediction/disease/health-score/${tileId}`;
 
-
-  const idealConditions = {
-    temperature: { min: 18, max: 30, label: "°C" },
-    humidity: { min: 70, max: 90, label: "%" },
-    uvLevel: { min: 0, max: 3, label: "" },
-    soilMoisture: { min: 200, max: 400, label: "" },
-    pressure: { min: 100000, max: 102000, label: "Pa" },
-    altitude: { min: 600, max: 2500, label: "m" },
-  };
-
-
-  const checkValue = (value: number, range: { min: number; max: number }) => {
-    if (value >= range.min && value <= range.max) {
-      return 'Ideal'; 
-    } else if (value < range.min) {
-      return 'Too Low'; 
-    } else {
-      return 'Too High'; 
-    }
-  };
-
-
+  // Convert time to 12-hour format
   const convertTo12HourFormat = (time: string) => {
     const [hours, minutes, seconds] = time.split(':');
     let hour = parseInt(hours);
     const amPm = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12; 
+    hour = hour % 12 || 12; // Convert to 12-hour format, making '0' hours as '12'
     return `${hour}:${minutes}:${seconds} ${amPm}`;
   };
 
-  useEffect(() => {
-    const fetchIoTData = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/iot/get_enviroment_data`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const result = await response.json();
-
-        const transformedData: IoTData[] = result.map((item: any) => ({
-          id: item.id,
-          recordedDateTime: `${item.recorded_date}, ${convertTo12HourFormat(item.recorded_time)}`,
-          temperature: item.temperature,
-          humidity: item.humidity,
-          uvLevel: item.uvLevel,
-          soilMoisture: item.soilMoisture,
-          pressure: item.pressure,
-          altitude: item.altitude,
-        }));
-
-        const sortedData = transformedData.sort((a, b) => b.id - a.id);
-        setData(sortedData);
-      } catch (error) {
-        console.error('Error fetching IoT data:', error);
+  // Fetch disease vulnerability for a tile
+  const fetchDiseaseVulnerability = async (tileId: number) => {
+    try {
+      const response = await fetch(PREDICTION_API_URL(tileId));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch disease vulnerability for tile ID: ${tileId}`);
       }
-    };
+      const result = await response.json();
+      return result.result || 'Unknown'; // Default value if the result is not present
+    } catch (error) {
+      console.error('Error fetching disease vulnerability:', error);
+      return 'Unknown';
+    }
+  };
 
-    fetchIoTData();
-  }, [API_BASE_URL]);
+  // Fetch tile data and merge with disease vulnerability
+  const fetchTileData = async () => {
+    try {
+      const tileResponse = await fetch(TILE_API_URL);
+      if (!tileResponse.ok) {
+        throw new Error('Failed to fetch tile data');
+      }
+      const tiles = await tileResponse.json();
+
+      // Fetch disease vulnerability for each tile
+      const transformedData: IoTData[] = await Promise.all(
+        tiles.map(async (tile: any) => {
+          const diseaseVulnerability = await fetchDiseaseVulnerability(tile.id);
+          return {
+            id: tile.id,
+            recordedDateTime: `${tile.createdDate}, ${convertTo12HourFormat(tile.createdDate.split(' ')[1])}`,
+            temperature: tile.temperature,
+            humidity: tile.humidity,
+            uvLevel: tile.uvLevel,
+            diseaseVulnerability: diseaseVulnerability, // From second API
+          };
+        })
+      );
+
+      const sortedData = transformedData.sort((a, b) => b.id - a.id);
+      setData(sortedData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTileData();
+  }, []);
 
   const handleRowClick = (rowData: IoTData) => {
     setSelectedData(rowData);
@@ -87,13 +85,11 @@ const DiseaseTb: React.FC = () => {
 
   // Define table columns
   const columns = [
-    { label: 'Recorded Date & Time', key: 'recordedDateTime' },
+    { label: 'Block ID', key: 'id' },
     { label: 'Temperature', key: 'temperature' },
     { label: 'Humidity', key: 'humidity' },
     { label: 'UV Level', key: 'uvLevel' },
-    { label: 'Soil Moisture', key: 'soilMoisture' },
-    { label: 'Pressure', key: 'pressure' },
-    { label: 'Altitude', key: 'altitude' },
+    { label: 'Disease Vulnerability', key: 'diseaseVulnerability' },
   ];
 
   return (
@@ -111,77 +107,11 @@ const DiseaseTb: React.FC = () => {
         <DialogContent style={{ backgroundColor: '#F1F8E9' }}>
           {selectedData ? (
             <>
-              <Typography variant="h6" color="textPrimary"><strong>Recorded Date & Time:</strong> {selectedData.recordedDateTime}</Typography>
-
-              {/* Display Temperature with suitability check */}
-              <Box display="flex" justifyContent="space-between" my={2}>
-                <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
-                  <Typography variant="h6">Temperature</Typography>
-                  <Typography variant="body1" fontWeight="bold">
-                    {selectedData.temperature} °C
-                  </Typography>
-                  <Typography variant="body2">
-                    Status: {checkValue(parseFloat(selectedData.temperature), idealConditions.temperature)}
-                  </Typography>
-                </Box>
-
-                {/* Display Humidity with suitability check */}
-                <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
-                  <Typography variant="h6">Humidity</Typography>
-                  <Typography variant="body1" fontWeight="bold">
-                    {selectedData.humidity} %
-                  </Typography>
-                  <Typography variant="body2">
-                    Status: {checkValue(parseFloat(selectedData.humidity), idealConditions.humidity)}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Display UV Level and Soil Moisture with suitability check */}
-              <Box display="flex" justifyContent="space-between" my={2}>
-                <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
-                  <Typography variant="h6">UV Level</Typography>
-                  <Typography variant="body1" fontWeight="bold">
-                    {selectedData.uvLevel}
-                  </Typography>
-                  <Typography variant="body2">
-                    Status: {checkValue(parseFloat(selectedData.uvLevel), idealConditions.uvLevel)}
-                  </Typography>
-                </Box>
-
-                <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
-                  <Typography variant="h6">Soil Moisture</Typography>
-                  <Typography variant="body1" fontWeight="bold">
-                    {selectedData.soilMoisture}
-                  </Typography>
-                  <Typography variant="body2">
-                    Status: {checkValue(parseFloat(selectedData.soilMoisture), idealConditions.soilMoisture)}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Display Pressure and Altitude with suitability check */}
-              <Box display="flex" justifyContent="space-between" my={2}>
-                <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
-                  <Typography variant="h6">Pressure</Typography>
-                  <Typography variant="body1" fontWeight="bold">
-                    {selectedData.pressure} Pa
-                  </Typography>
-                  <Typography variant="body2">
-                    Status: {checkValue(parseFloat(selectedData.pressure), idealConditions.pressure)}
-                  </Typography>
-                </Box>
-
-                <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
-                  <Typography variant="h6">Altitude</Typography>
-                  <Typography variant="body1" fontWeight="bold">
-                    {selectedData.altitude} m
-                  </Typography>
-                  <Typography variant="body2">
-                    Status: {checkValue(parseFloat(selectedData.altitude), idealConditions.altitude)}
-                  </Typography>
-                </Box>
-              </Box>
+              <Typography variant="h6" color="textPrimary"><strong>Block ID:</strong> {selectedData.id}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} °C</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>UV Level:</strong> {selectedData.uvLevel}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Disease Vulnerability:</strong> {selectedData.diseaseVulnerability}</Typography>
             </>
           ) : (
             <Typography variant="body1">Loading...</Typography>
@@ -198,7 +128,3 @@ const DiseaseTb: React.FC = () => {
 };
 
 export default DiseaseTb;
-
-
-
-

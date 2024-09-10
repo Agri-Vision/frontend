@@ -22,9 +22,9 @@ const MapDashboard: React.FC = () => {
   const getImagePath = () => {
     switch (mapType) {
       case 'ndvi':
-        return '../src/assets/maps/ndvi_map_overlay.png';
+        return '../src/assets/maps/NDVI_map.png';
       case 'rendvi':
-        return '../src/assets/maps/rendvi_map_overlay.png';
+        return '../src/assets/maps/RENDVI_map.png';
       default:
         return '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png';
     }
@@ -157,12 +157,10 @@ const MapDashboard: React.FC = () => {
 
         // Array of values for each grid block
         const blockValues = [
-          ['Yeild- 0 ,Stress- 0, Disease- 0', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 10 ,Stress- no, Disease- no', 'Yeild- 0 ,Stress- no, Disease- no'],
-          ['Yeild- 5 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- Yes', 'Yeild- 30 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 5 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- Yes', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-        ];
-
+          ['B01 Disease- no', 'B02 Disease- no', 'B03 Disease- Yes', 'B04 Disease- Yes'],
+          ['B05 Disease- no', 'B06- Disease- Yes', 'B07 Disease- no', 'B08 Disease- Yes'],
+          ['B09 Disease- no', 'B10 Disease- Yes', 'B11 Disease- Yes', 'B12 Disease- no'],
+          ['B13 Disease- no', 'B14 Disease- no', 'B15 Disease- no', 'B16 Disease- no'],];
         // Grid overlay with hover, stress, yield, and disease logic
         class GridOverlay extends window.google.maps.OverlayView {
           div: HTMLDivElement | null = null;
