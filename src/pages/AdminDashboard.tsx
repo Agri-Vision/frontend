@@ -1,22 +1,25 @@
 import React from 'react';
-import { Grid, Box, Typography } from '@mui/material';
+import { Grid, Box, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import "../assets/styles/agentDashboard.css";
 import DashboardMetrics from '../compoenents/AgentDashboardPannels/DashboardMetrics';
 import ProjectSection from '../compoenents/AgentDashboardPannels/ProjectSection';
 
 const AdminDashboard: React.FC = () => {
+    const navigate = useNavigate(); // Use useNavigate instead of useHistory
+
     return (
         <Box sx={{ padding: 2, maxWidth: '100%', margin: '0 auto' }}>
             <Grid container spacing={3}>
                 {/* Dashboard Header */}
                 <Grid item xs={12}>
-                <Typography 
-                    variant="h4"
-                    component="h1"
-                    gutterBottom
-                    sx={{ fontFamily: 'Poppins , sans-serif',
-                        fontWeight: 'bold',
-                        color: '#5D6965'}}>
+                    <Typography 
+                        variant="h4"
+                        component="h1"
+                        gutterBottom
+                        sx={{ fontFamily: 'Poppins , sans-serif',
+                            fontWeight: 'bold',
+                            color: '#5D6965'}}>
                         Admin Dashboard
                     </Typography>
                 </Grid>
@@ -26,10 +29,22 @@ const AdminDashboard: React.FC = () => {
                     <DashboardMetrics />
                 </Grid>
 
+                {/* Create Projects Button */}
+                <Grid item xs={12}>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        sx={{ marginBottom: 2 }}
+                        onClick={() => navigate('create-project')} // Updated to use navigate
+                    >
+                        Create Projects
+                    </Button>
+                </Grid>
+
                 {/* New Assignments Section */}
                 <Grid item xs={12}>
                     <ProjectSection
-                        title="New Assignments"
+                        title="Projects"
                         apiEndpoint="https://api.example.com/new-assignments"
                         initialData={[
                             { id: '1', estateName: 'Some Estate', title: 'Description 1', date: '10 Juli 2022', imageUrl: '../assets/img/estate1.jpeg' },
@@ -38,35 +53,9 @@ const AdminDashboard: React.FC = () => {
                         ]}
                     />
                 </Grid>
-
-                {/* Upcoming Renew Section */}
-                <Grid item xs={12}>
-                    <ProjectSection
-                        title="Upcoming Renew"
-                        apiEndpoint="https://api.example.com/upcoming-renew"
-                        initialData={[
-                            { id: '4', estateName: 'Forest Estate', title: 'Description 4', date: '13 Juli 2022', imageUrl: '/path/to/image4.jpg' },
-                            { id: '5', estateName: 'Riverbank Estate', title: 'Description 5', date: '14 Juli 2022', imageUrl: '/path/to/image5.jpg' },
-                            { id: '6', estateName: 'Mountain View Estate', title: 'Description 6', date: '15 Juli 2022', imageUrl: '/path/to/image6.jpg' },
-                            { id: '7', estateName: 'Beach Estate', title: 'Description 7', date: '16 Juli 2022', imageUrl: '/path/to/image7.jpg' },
-                        ]}
-                    />
-                </Grid>
-
-                {/* Up To Date Section */}
-                <Grid item xs={12}>
-                    <ProjectSection
-                        title="Up To Date"
-                        apiEndpoint="https://api.example.com/up-to-date"
-                        initialData={[]} // No data to show "No current assignments"
-                    />
-                </Grid>
             </Grid>
         </Box>
     );
 };
 
 export default AdminDashboard;
-
-
-

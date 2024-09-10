@@ -9,6 +9,7 @@ import CustomerMainDetail from "../pages/CustomerMainDetail";
 import AgentDashboard from "../pages/AgentDashboard";
 import Example1 from "../pages/Example1";
 import ProjectDetail from "../compoenents/AgentDashboardPannels/ProjectDetail";
+import AdminProjectCreation from "../compoenents/AdminDashboardPannels/AdminProjectCreation";
 import AdminDashboard from "../pages/AdminDashboard";
 
 import { NotFoundPage } from "../pages/NotFound";
@@ -25,6 +26,7 @@ const IndexRoutes: React.FC = () => {
                     <Route path="agent-dashboard/project/:id" element={<ProjectDetail />} />
                     <Route path="admin-dashboard" element={<AdminDashboard />} />
                     <Route path="admin-dashboard/project/:id" element={<ProjectDetail />} />
+                    <Route path="admin-dashboard/create-project" element={<AdminProjectCreation />} />
 
                     <Route path="example1" element={<Example1 />} />                    
                 </Route>
