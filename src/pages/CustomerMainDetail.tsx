@@ -19,7 +19,7 @@ return (
       <div className="right-column"><RightPannel /></div>
       <div className="iot-container" ><IotDetailPannel /></div>
       <div className="iot-History-Table" ><IoTHistoryTb /></div>
-      <div className="yield-History-Table" ><YieldHistoryTb /></div>
+      {/* <div className="yield-History-Table" ><YieldHistoryTb /></div> */}
     </div>
 );
 };
