@@ -54,8 +54,14 @@ const AgentDashboard: React.FC = () => {
             <Grid container spacing={3}>
                 {/* Dashboard Header */}
                 <Grid item xs={12}>
-                    <Typography variant="h4" component="h1" gutterBottom>
-                        Dashboard
+                <Typography 
+                    variant="h4"
+                    component="h1"
+                    gutterBottom
+                    sx={{ fontFamily: 'Poppins , sans-serif',
+                        fontWeight: 'bold',
+                        color: '#5D6965'}}>
+                        Agent Dashboard
                     </Typography>
                 </Grid>
                 

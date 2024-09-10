@@ -53,7 +53,10 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ title, apiEndpoint, ini
 
     return (
         <Box sx={{ marginTop: 4, width: '100%' }}>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h5" gutterBottom 
+            sx={{ fontWeight: 'bold',
+            fontFamily: 'Poppins , sans-serif',
+            color: '#5c8843' }}>
                 {title}
             </Typography>
             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
