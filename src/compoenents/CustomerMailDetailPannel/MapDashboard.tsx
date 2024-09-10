@@ -214,12 +214,44 @@
 // };
  
 // export default MapDashboard;
-
 import React, { useEffect, useRef } from 'react';
+import { useButtonContext } from '../ButtonContext'; // For Stress, Yield, and Disease toggle context
+import { useIoTContext } from '../IoTContext'; // For IoT toggle context
+import { useMapTypeContext } from '../MapTypeContext'; // For MapTypeContext
+
+declare global {
+  interface Window {
+    initMap: () => void;  // Extend the Window interface
+  }
+}
 
 const MapDashboard: React.FC = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const markerRef = useRef<any>(null);  // Store the marker reference
   const overlayRef = useRef<any>(null);
+
+  const { isStressActive, isDiseaseActive, isYieldActive } = useButtonContext(); // Access stress, yield, and disease state from context
+  const { iotEnabled } = useIoTContext(); // Access IoT marker toggle state
+  const { mapType } = useMapTypeContext(); // Access map type from context
+
+  // Dynamically set image path based on selected map type
+  const getImagePath = () => {
+    switch (mapType) {
+      case 'ndvi':
+        return '../src/assets/maps/NDVI_map.png';
+      case 'rendvi':
+        return '../src/assets/maps/RENDVI_map.png';
+      default:
+        return '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png';
+    }
+  };
+
+  // Function to determine yield color intensity
+  const getYieldColor = (yieldValue: number) => {
+    const normalizedValue = Math.min(Math.max(yieldValue, 0), 30); // Cap the value between 0 and 30
+    const intensity = Math.floor((normalizedValue / 30) * 255);
+    return `rgba(0, ${intensity}, 0, 0.6)`; // Green with varying intensity
+  };
 
   useEffect(() => {
     const initMap = () => {
@@ -238,7 +270,7 @@ const MapDashboard: React.FC = () => {
           new window.google.maps.LatLng(7.1947473, 80.5402994)
         );
 
-        const image = '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png';
+        const image = getImagePath(); // Get image based on the selected map type
 
         // Extend max zoom level using MaxZoomService
         const center = map.getCenter();
@@ -262,31 +294,33 @@ const MapDashboard: React.FC = () => {
           });
         }
 
-        // Add a marker for the IoT device on the map
+        // Add marker for the IoT device
         const markerPosition = {
-          lat: 7.19448, // Latitude of IoT device
-          lng: 80.5401, // Longitude of IoT device
+          lat: 7.19448,
+          lng: 80.5401,
         };
 
-        const marker = new window.google.maps.Marker({
+        // Create marker and store its reference
+        markerRef.current = new window.google.maps.Marker({
           position: markerPosition,
-          map,
+          map: iotEnabled ? map : null, // Show or hide based on IoT toggle state
           title: 'IoT Device Location',
           icon: {
-            url: '../src/assets/markers/iot-marker.png', // Custom icon file path
-            scaledSize: new window.google.maps.Size(40, 40), // size of the icon
+            url: '../src/assets/markers/iot-marker.png',
+            scaledSize: new window.google.maps.Size(40, 40),
           },
+          zIndex: 1, // Ensure marker stays on top
         });
 
         const infoWindow = new window.google.maps.InfoWindow({
           content: `<div><h3>IoT Device</h3><p>Location: (${markerPosition.lat}, ${markerPosition.lng})</p><p>Status: Active</p></div>`,
         });
 
-        marker.addListener('click', () => {
-          infoWindow.open(map, marker);
+        markerRef.current.addListener('click', () => {
+          infoWindow.open(map, markerRef.current);
         });
 
-        // Image overlay class
+        // Image overlay class for the grid
         class CustomOverlay extends window.google.maps.OverlayView {
           bounds: any;
           image: string;
@@ -342,9 +376,10 @@ const MapDashboard: React.FC = () => {
           ['Yeild- 0 ,Stress- 0, Disease- 0', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 10 ,Stress- no, Disease- no', 'Yeild- 0 ,Stress- no, Disease- no'],
           ['Yeild- 5 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- Yes', 'Yeild- 30 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
           ['Yeild- 5 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
+          ['Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- Yes', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
         ];
 
+        // Grid overlay with hover, stress, yield, and disease logic
         class GridOverlay extends window.google.maps.OverlayView {
           div: HTMLDivElement | null = null;
           bounds: any;
@@ -357,7 +392,7 @@ const MapDashboard: React.FC = () => {
           onAdd() {
             this.div = document.createElement('div');
             this.div.style.position = 'absolute';
-            this.div.style.zIndex = '1000'; // Ensure it's on top of other elements
+            this.div.style.zIndex = '0'; // Set lower z-index for grid
 
             const panes = this.getPanes();
             if (panes && panes.overlayMouseTarget) {
@@ -375,6 +410,29 @@ const MapDashboard: React.FC = () => {
                 block.style.height = '25%';
                 block.style.left = `${i * 25}%`;
                 block.style.top = `${j * 25}%`;
+                block.style.zIndex = '0'; // Ensure grid blocks are behind markers
+
+                const blockValue = blockValues[i][j];
+                const isStress = blockValue.includes('Stress- Yes');
+                const isDisease = blockValue.includes('Disease- Yes');
+                const yieldMatch = blockValue.match(/Yeild- (\d+)/);
+                const yieldValue = yieldMatch ? parseInt(yieldMatch[1], 10) : 0;
+
+                // If stress is active and the block contains "Stress- Yes", set the background to red
+                if (isStressActive && isStress) {
+                  block.style.backgroundColor = 'rgba(255, 0, 0, 0.2)'; // Highlight red for stress
+                }
+
+                // If disease is active, highlight in light brown
+                if (isDiseaseActive && isDisease) {
+                  block.style.backgroundColor = 'rgba(105, 0, 0, 0.4)'; // Light brown for disease
+                }
+
+                // If yield is active, adjust the color intensity based on the yield value
+                if (isYieldActive) {
+                  block.style.backgroundColor = getYieldColor(yieldValue);
+                }
+
                 block.style.display = 'flex';
                 block.style.alignItems = 'center';
                 block.style.justifyContent = 'center';
@@ -383,12 +441,15 @@ const MapDashboard: React.FC = () => {
 
                 // Add hover effects for background color and text
                 block.onmouseover = () => {
-                  block.style.backgroundColor = 'rgba(222, 242, 211, 0.4)'; // Highlight color on hover
+                  if (!isStressActive || !isStress) {
+                    block.style.backgroundColor = 'rgba(222, 242, 211, 0.4)'; // Highlight color on hover
+                  }
                   block.style.color = 'white'; // Show text on hover
-                  block.textContent = blockValues[i][j]; // Show the corresponding value from the array
+                  block.textContent = blockValue; // Show the corresponding value from the array
                 };
+
                 block.onmouseout = () => {
-                  block.style.backgroundColor = 'transparent'; // Revert to transparent on mouse out
+                  block.style.backgroundColor = isStressActive && isStress ? 'rgba(255, 0, 0, 0.2)' : isYieldActive ? getYieldColor(yieldValue) : 'transparent';
                   block.style.color = 'transparent'; // Hide text again
                   block.textContent = ''; // Clear the text content
                 };
@@ -419,18 +480,23 @@ const MapDashboard: React.FC = () => {
       }
     };
 
-    // Ensure the API is loaded correctly only once
     if (!window.google || !window.google.maps) {
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBKwT3-cq00IaM04TcHh1UiePAgjbp9LN4&callback=initMap`;
       script.async = true;
-      script.defer = true; // Make sure the script is loaded asynchronously
       document.head.appendChild(script);
-      window.initMap = initMap; // Assign initMap to the global window object
+      window.initMap = initMap;
     } else {
       initMap();
     }
-  }, []);
+  }, [isStressActive, isDiseaseActive, isYieldActive, iotEnabled, mapType]); // Re-run when any of the states change
+
+  // Update IoT marker visibility when iotEnabled changes
+  useEffect(() => {
+    if (markerRef.current) {
+      markerRef.current.setMap(iotEnabled ? markerRef.current.getMap() : null);
+    }
+  }, [iotEnabled]);
 
   return (
     <div>
