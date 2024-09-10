@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
-import { Select, MenuItem, FormControl, InputLabel, Switch, FormControlLabel, Box, Typography, Grid, Card, CardContent, SelectChangeEvent } from '@mui/material';
+import React from 'react';
+import { FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Typography, Grid, Card, CardContent } from '@mui/material';
+import { useIoTContext } from '../IoTContext'; // Import the IoTContext
+import { useMapTypeContext } from '../MapTypeContext'; // Import the MapTypeContext
+import { SelectChangeEvent } from '@mui/material';  // Import SelectChangeEvent
 
 const MapController: React.FC = () => {
-  const [mapType, setMapType] = useState<string>('satellite');
-  const [iotEnabled, setIotEnabled] = useState<boolean>(false);
+  const { iotEnabled, toggleIoT } = useIoTContext();  // Access IoT context
+  const { mapType, setMapType } = useMapTypeContext();  // Access MapType context
 
+  // Use SelectChangeEvent<string> as the event type
   const handleMapChange = (event: SelectChangeEvent<string>) => {
-    setMapType(event.target.value as string);
-  };
-
-  const handleIotToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIotEnabled(event.target.checked);
+    setMapType(event.target.value as string);  // Update mapType globally
   };
 
   return (
     <Card elevation={1} sx={{ maxWidth: 300, mx: 'auto', mt: 3, backgroundColor: '#FFFFFF', borderRadius: '12px' }}>
       <CardContent>
         <Grid container spacing={2} justifyContent="center" alignItems="center">
-          
-          {/* Header spanning two columns */}
           <Grid item xs={12}>
             <Typography
               variant="h6"
@@ -35,8 +33,8 @@ const MapController: React.FC = () => {
               MAP CONTROLLERS
             </Typography>
           </Grid>
-          
-          {/* Map Type Label and Selection in the same line */}
+
+          {/* Map Type Selection */}
           <Grid item xs={4}>
             <Typography
               variant="h6"
@@ -60,27 +58,26 @@ const MapController: React.FC = () => {
               <Select
                 labelId="map-type-label"
                 value={mapType}
-                onChange={handleMapChange}
+                onChange={handleMapChange}  // Correct event handler
                 label="Map Type"
               >
-                <MenuItem value=""></MenuItem>
                 <MenuItem value="drone">Drone Map</MenuItem>
-                <MenuItem value="satellite">NDVI Map</MenuItem>
-                <MenuItem value="satellite">RENDVI Map</MenuItem>
+                <MenuItem value="ndvi">NDVI Map</MenuItem>
+                <MenuItem value="rendvi">RENDVI Map</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          
-          {/* IoT Devices Label and Toggle */}
+
+          {/* IoT Toggle Switch */}
           <Grid item xs={12}>
             <FormControlLabel
               control={
                 <Switch
                   checked={iotEnabled}
-                  onChange={handleIotToggle}
+                  onChange={toggleIoT}  // Toggle IoT state
                   color="warning"
                   size="small"
-                  sx={{ pl: 1, m: 1 }} // Adds padding and margin to the switch
+                  sx={{ pl: 1, m: 1 }} 
                 />
               }
               label={
@@ -102,7 +99,6 @@ const MapController: React.FC = () => {
               sx={{ justifyContent: 'space-between', ml: 0 }}
             />
           </Grid>
-
         </Grid>
       </CardContent>
     </Card>
