@@ -9,6 +9,8 @@ import CustomerMainDetail from "../pages/CustomerMainDetail";
 import AgentDashboard from "../pages/AgentDashboard";
 import Example1 from "../pages/Example1";
 import ProjectDetail from "../compoenents/AgentDashboardPannels/ProjectDetail";
+import AdminDashboard from "../pages/AdminDashboard";
+
 import { NotFoundPage } from "../pages/NotFound";
 import { Loading } from "../pages/Loading";
 
@@ -21,6 +23,9 @@ const IndexRoutes: React.FC = () => {
                     <Route path="customer-main-detail" element={<CustomerMainDetail />} />
                     <Route path="agent-dashboard" element={<AgentDashboard />} />
                     <Route path="agent-dashboard/project/:id" element={<ProjectDetail />} />
+                    <Route path="admin-dashboard" element={<AdminDashboard />} />
+                    <Route path="admin-dashboard/project/:id" element={<ProjectDetail />} />
+
                     <Route path="example1" element={<Example1 />} />                    
                 </Route>
                 <Route path="/loading" element={<Loading />} />
