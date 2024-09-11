@@ -18,7 +18,7 @@ interface ProjectSectionProps {
     initialData: Project[];
 }
 
-const ProjectSection: React.FC<ProjectSectionProps> = ({ title, apiEndpoint, initialData }) => {
+const AdminProjects: React.FC<ProjectSectionProps> = ({ title, apiEndpoint, initialData }) => {
     const navigate = useNavigate();
 
     const [projects, setProjects] = useState<Project[]>(initialData);
@@ -133,4 +133,4 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ title, apiEndpoint, ini
     );
 };
 
-export default ProjectSection;
+export default AdminProjects;

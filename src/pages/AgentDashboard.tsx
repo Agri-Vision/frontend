@@ -1,47 +1,3 @@
-// import { CssBaseline } from '@mui/material';
-// import React from 'react';
-// import { Container } from '@mui/material';
-
-// import "../assets/styles/agentDashboard.css";
-// //import StatCards from "../compoenents/AgentDashboardPannels/StatCards";
-// import NewAssignments from "../compoenents/AgentDashboardPannels/NewAssignments";
-// import UpComingRenews from "../compoenents/AgentDashboardPannels/UpComingRenews";
-// import DashboardMetrics from '../compoenents/AgentDashboardPannels/DashboardMetrics';
-// import ProjectSection from '../compoenents/AgentDashboardPannels/ProjectSection';
-
-// const AgentDashboard = () => {
-
-// return (
- 
-
-//   <div className="dashboard">
-//   <div className="dashboard-header">
-//     <h1>Dashboard</h1>
-//     {/* <StatCards /> */}
-//     <DashboardMetrics />
-//   </div>
-//   {/* <NewAssignments />
-//   <UpComingRenews /> */}
-//   <ProjectSection title="New Assignments" apiEndpoint="https://api.example.com/new-assignments" />
-//   <ProjectSection title="Upcoming Renew" apiEndpoint="https://api.example.com/upcoming-renew" />
-//   <ProjectSection title="Up To Date" apiEndpoint="https://api.example.com/up-to-date" />
-        
-// </div>
-
-
-// );
-// // return (
-// //   <Container sx={{ paddingY: 4 }}>
-//         //     <DashboardMetrics />
-//         //     <ProjectSection title="New Assignments" apiEndpoint="https://api.example.com/new-assignments" />
-//         //     <ProjectSection title="Upcoming Renew" apiEndpoint="https://api.example.com/upcoming-renew" />
-//         //     <ProjectSection title="Up To Date" apiEndpoint="https://api.example.com/up-to-date" />
-//         // </Container>
-// // );
-// };
-
-// export default AgentDashboard;
-
 import React from 'react';
 import { Grid, Box, Typography } from '@mui/material';
 import "../assets/styles/agentDashboard.css";
@@ -54,8 +10,14 @@ const AgentDashboard: React.FC = () => {
             <Grid container spacing={3}>
                 {/* Dashboard Header */}
                 <Grid item xs={12}>
-                    <Typography variant="h4" component="h1" gutterBottom>
-                        Dashboard
+                <Typography 
+                    variant="h4"
+                    component="h1"
+                    gutterBottom
+                    sx={{ fontFamily: 'Poppins , sans-serif',
+                        fontWeight: 'bold',
+                        color: '#5D6965'}}>
+                        Agent Dashboard
                     </Typography>
                 </Grid>
                 
