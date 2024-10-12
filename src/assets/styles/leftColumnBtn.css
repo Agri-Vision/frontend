@@ -1,0 +1,104 @@
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  
+  width: 270px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding-top: 15px;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.control-button {
+  background-color: #5c8843;
+  border-radius: 20px;
+  font-family: 'Nunito', 'Poppins', sans-serif; /* Use the imported font */
+  font-weight: 700; /* Adjust font weight as per the design */
+  color: white;
+  padding: 10px 20px;
+  text-transform: none; /* Remove default uppercase transform, if needed */
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect */
+.control-button:hover {
+  background-color: #061a29;
+}
+
+.info-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 10px; /* Add margin to space out from the Real Time text */
+}
+
+.info-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.highlight-temperature {
+  background-color: #DAF5DB;
+}
+
+.highlight-humidity {
+  background-color: #DAF5DB;
+}
+
+.highlight-soil {
+  background-color: #DAF5DB;
+}
+
+.highlight-uv {
+  background-color: #DAF5DB;
+}
+
+.highlight-pressure {
+  background-color: #DAF5DB;
+}
+
+.highlight-altitude {
+  background-color: #DAF5DB;
+}
+
+.info-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #5d6063;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.info-value-soil {
+  font-size: 21px;
+  font-weight: bold;
+  color: #5d6063;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.info-label {
+  font-size: 12px;
+  color: #5D6965;
+  font-family:sans-serif;
+}
+
+.real-time-text {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+  margin-top: 10px;
+}
