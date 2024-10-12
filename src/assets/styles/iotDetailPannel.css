@@ -1,0 +1,16 @@
+.iot-row {
+  display: flex;
+  overflow-x: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+  width: 100%; /* Ensure the row takes the full width */
+}
+
+.iot-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.iot-row::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}

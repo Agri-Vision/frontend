@@ -1,14 +1,15 @@
 import { FunctionComponent, PropsWithChildren, ReactElement } from "react";
-
 // import MuiSideNav from "../components/SideNavBars/MuiSideNav";
-
-import ViewQuiltOutlinedIcon from '@mui/icons-material/ViewQuiltOutlined';
-import DraftsOutlinedIcon from '@mui/icons-material/DraftsOutlined';
-import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
-import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-
+import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
+//import DraftsOutlinedIcon from '@mui/icons-material/DraftsOutlined';
+//import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
+//import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
+// import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MuiExpandableSidebar from "../compoenents/SideNavBars/MuiExpandableSidebar";
+import HomeIcon from '@mui/icons-material/Home';
+import GrassIcon from '@mui/icons-material/Grass';
+import SpaIcon from '@mui/icons-material/Spa';
+import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 
 interface SideNavBarPropsInterface { }
 
@@ -17,51 +18,50 @@ const SideNavBar: FunctionComponent<
 > = (): ReactElement => {
   const navItems = [
     {
-      icon: <ViewQuiltOutlinedIcon />,
-      label: "Example1",
-      link: "/home/example1",
+      icon: <HomeIcon />,
+      label: "Home",
+      link: "/home/customer-main-detail"
     },
     {
-      icon: <DraftsOutlinedIcon />,
-      label: "Example2",
-      link: "/home/example2",
+      icon: <GridViewOutlinedIcon />,
+      label: "Dashboard",
+      link: "/home/customer-main-detail",
     },
     {
-      icon: <SendOutlinedIcon />,
-      label: "Example3",
-      link: "/home/example3",
+      icon: <SpaIcon />,
+      label: "Yeild Dashboard",
+      link: "/home/yeild-dashboard",
     },
     {
-      icon: <StarBorderOutlinedIcon />,
-      label: "Example4",
-      link: "/home/example4",
+      icon: <GrassIcon />,
+      label: "Stress Dashboard",
+      link: "/home/stress-dashboard",
     },
     {
-      icon: <DeleteOutlinedIcon />,
-      label: "Example5",
-      link: "/home/example5",
+      icon: <CoronavirusIcon />,
+      label: "Disease Dashboard",
+      link: "/home/disease-dashboard",
     },
-    {
-      icon: <ViewQuiltOutlinedIcon />,
-      label: "Example6",
-      subItems: [
-        {
-          icon: <StarBorderOutlinedIcon />,
-          label: "SubExample1",
-          link: "/home/example1",
-        },
-        {
-          icon: <DeleteOutlinedIcon />,
-          label: "SubExample2",
-          link: "/home/subexample2",
-        },
-      ],
-    },
+    // {
+    //   icon: <DraftsOutlinedIcon />,
+    //   label: "Example6",
+    //   subItems: [
+    //     {
+    //       icon: <StarBorderOutlinedIcon />,
+    //       label: "SubExample1",
+    //       link: "/home/example1",
+    //     },
+    //     {
+    //       icon: <DeleteOutlinedIcon />,
+    //       label: "SubExample2",
+    //       link: "/home/subexample2",
+    //     },
+    //   ],
+    // },
   ];
 
   return (
     <>
-      {/* <MuiSideNav items={navItems} /> */}
       <MuiExpandableSidebar items={navItems} />
 
     </>
