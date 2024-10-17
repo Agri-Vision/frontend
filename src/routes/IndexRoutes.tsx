@@ -15,6 +15,8 @@ import ProjectDetail from "../compoenents/AgentDashboardPannels/ProjectDetail";
 import { NotFoundPage } from "../pages/NotFound";
 import { Loading } from "../pages/Loading";
 
+import Hometest from "../pages/HomeTest";
+
 const IndexRoutes: React.FC = () => {
     return (
         <SecureApp fallback={<Loading />}>
@@ -27,7 +29,9 @@ const IndexRoutes: React.FC = () => {
                     <Route path="disease-dashboard" element={<DiseaseMainDashboard />} />
                     <Route path="agent-dashboard" element={<AgentDashboard />} />
                     <Route path="agent-dashboard/project/:id" element={<ProjectDetail />} />
-                    <Route path="example1" element={<Example1 />} />                    
+                    <Route path="example1" element={<Example1 />} />  
+
+                    <Route path="home-test" element={<Hometest />} />                  
                 </Route>
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/NotFoundPage" element={<NotFoundPage />} />
