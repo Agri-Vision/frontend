@@ -15,10 +15,12 @@ interface WeatherData {
 const WeatherTab: React.FC = () => {
   const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
 
-  const apiKey = 'fccc485f05220e2f7c958d653e26bc7b';
+  const apiKey = import.meta.env.VITE_API_KEY;
   const lat = '7.1947473';
   const lon = '80.5402994';
   const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+
+  
 
   useEffect(() => {
     const fetchWeatherData = async () => {
