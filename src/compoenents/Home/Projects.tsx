@@ -12,6 +12,7 @@ interface Project {
   };
   plantation: {
     plantationName: string;
+    plantationImgUrl: string;
   };
   iotDeviceList: Array<{ id: number }>;
   createdDate: string;
@@ -43,7 +44,7 @@ const Projects: React.FC = () => {
               month: 'long',
               year: 'numeric',
             })}</div>
-            <img className="project-image" src={'../src/assets/img/estate1.jpeg'} alt={project.projectName} />
+            <img className="project-image" src={project.plantation.plantationImgUrl} alt={project.projectName} />
             <div className="project-details" style={{ fontFamily: 'Nunito, Poppins, sans-serif', lineHeight: '1.2' }}>
               
               <p style={{ marginBottom: '5px', fontWeight: 'bold' }}>{project.plantation.plantationName}</p>
