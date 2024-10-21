@@ -1,12 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, Box, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import "../assets/styles/agentDashboard.css";
 import DashboardMetrics from '../compoenents/AgentDashboardPannels/DashboardMetrics';
-import ProjectSection from '../compoenents/AgentDashboardPannels/ProjectSection';
+import ProjectSection from '../compoenents/AdminDashboardPanels/ProjectSelection';
 
 const AdminDashboard: React.FC = () => {
-    const navigate = useNavigate(); // Use useNavigate instead of useHistory
+    const navigate = useNavigate();
+    const [projects, setProjects] = useState<any[]>([]); // State to store project data
+    const [loading, setLoading] = useState(true); // State to show loading status
+    const [error, setError] = useState<string | null>(null); // State to show error messages
+
+    useEffect(() => {
+        // Fetch the projects from the API
+        const fetchProjects = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/project');
+                setProjects(response.data); // Update the state with fetched data
+            } catch (error) {
+                setError('Failed to fetch projects');
+            } finally {
+                setLoading(false); // Set loading to false in either case
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
+    // Extracting the condition into a statement
+    let content;
+    if (loading) {
+        content = <Typography>Loading Projects...</Typography>;
+    } else if (error) {
+        content = <Typography color="error">{error}</Typography>;
+    } else {
+        content = <ProjectSection title="Projects" projects={projects} />; // Pass projects prop correctly
+    }
 
     return (
         <Box sx={{ padding: 2, maxWidth: '100%', margin: '0 auto' }}>
@@ -35,23 +65,24 @@ const AdminDashboard: React.FC = () => {
                         variant="contained" 
                         color="primary" 
                         sx={{ marginBottom: 2 }}
-                        onClick={() => navigate('create-project')} // Updated to use navigate
+                        onClick={() => navigate('create-project')} 
                     >
                         Create Projects
                     </Button>
+                    {/* Create Organization Button */}
+                    <Button 
+                        variant="contained" 
+                        color="secondary" 
+                        sx={{ marginLeft: 2, marginBottom: 2 }}
+                        onClick={() => navigate('create-organization')} 
+                    >
+                        Create Organization
+                    </Button>
                 </Grid>
 
-                {/* New Assignments Section */}
+                {/* Project Section */}
                 <Grid item xs={12}>
-                    <ProjectSection
-                        title="Projects"
-                        apiEndpoint="https://api.example.com/new-assignments"
-                        initialData={[
-                            { id: '1', estateName: 'Some Estate', title: 'Description 1', date: '10 Juli 2022', imageUrl: '../assets/img/estate1.jpeg' },
-                            { id: '2', estateName: 'HellBodde Estate', title: 'Description 2', date: '11 Juli 2022', imageUrl: '/path/to/image2.jpg' },
-                            { id: '3', estateName: 'Dunkel Estate', title: 'Description 3', date: '12 Juli 2022', imageUrl: '/path/to/image3.jpg' },
-                        ]}
-                    />
+                    {content}
                 </Grid>
             </Grid>
         </Box>
