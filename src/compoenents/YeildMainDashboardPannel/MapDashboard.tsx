@@ -222,6 +222,7 @@ import { useButtonContext } from '../ButtonContext'; // For Stress, Yield, and D
 import { useIoTContext } from '../IoTContext'; // For IoT toggle context
 import { useMapTypeContext } from '../MapTypeContext'; // For MapTypeContext
 
+
 declare global {
   interface Window {
     initMap: () => void; // Extend the Window interface

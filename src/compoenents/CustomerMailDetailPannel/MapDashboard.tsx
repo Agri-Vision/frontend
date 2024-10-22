@@ -11,8 +11,11 @@ declare global {
 }
 
 const MapDashboard: React.FC = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+
   const mapRef = useRef<HTMLDivElement | null>(null);
-  const markerRef = useRef<any>(null);  // Store the marker reference
+  const markerRefs = useRef<any[]>([]);  // Store references to IoT markers
   const overlayRef = useRef<any>(null);
   const { id } = useParams<{ id: string }>();
 
@@ -21,6 +24,14 @@ const MapDashboard: React.FC = () => {
   const { mapType } = useMapTypeContext(); // Access map type from context
 
   const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
+  const [geoCoordinates, setGeoCoordinates] = useState<{
+    upperLat: number;
+    lowerLat: number;
+    upperLng: number;
+    lowerLng: number;
+  } | null>(null);
+
+  const [iotDeviceList, setIoTDeviceList] = useState<any[]>([]); // Store the IoT device list
 
   // Hardcoded rows, cols, and block values for dynamic grid
   const numRows = 6; // Example number of rows
@@ -33,13 +44,30 @@ const MapDashboard: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/project/${id}`);
+        const response = await fetch(`${API_BASE_URL}/project/${id}`);
         const data = await response.json();
         const mapImagePngUrl = data?.taskList?.[0]?.mapImagePngUrl;
 
-        
+        console.log('map API'+mapImagePngUrl)
+
+        const upperLat = parseFloat(data?.taskList?.[0]?.upperLat);
+        const lowerLat = parseFloat(data?.taskList?.[0]?.lowerLat);
+        const upperLng = parseFloat(data?.taskList?.[0]?.upperLng);
+        const lowerLng = parseFloat(data?.taskList?.[0]?.lowerLng);
+
         if (mapImagePngUrl) {
           setMapImageUrl(mapImagePngUrl);
+        }
+
+        if (upperLat && lowerLat && upperLng && lowerLng) {
+          setGeoCoordinates({ upperLat, lowerLat, upperLng, lowerLng });
+        }
+        // Store the IoT device list from the response
+
+        if (data?.iotDeviceList) {
+
+          setIoTDeviceList(data.iotDeviceList);
+
         }
       } catch (error) {
         console.error('Error fetching map data:', error);
@@ -48,8 +76,6 @@ const MapDashboard: React.FC = () => {
 
     fetchData();
   }, [id]);
-
- 
 
   // Dynamically set image path based on selected map type
   const getImagePath = () => {
@@ -73,22 +99,88 @@ const MapDashboard: React.FC = () => {
 
   useEffect(() => {
     const initMap = () => {
-      if (mapRef.current) {
+      if (mapRef.current && geoCoordinates) {
+        const { upperLat, lowerLat, upperLng, lowerLng } = geoCoordinates;
+        const centerLat = (upperLat + lowerLat) / 2;
+        const centerLng = (upperLng + lowerLng) / 2;
+
         const map = new window.google.maps.Map(mapRef.current, {
           zoom: 20,
           center: {
-            lat: (7.1947473 + 7.1942133) / 2,
-            lng: (80.5402994 + 80.5399448) / 2,
+            lat: centerLat,
+            lng: centerLng,
           },
           mapTypeId: 'satellite',
         });
 
         const bounds = new window.google.maps.LatLngBounds(
-          new window.google.maps.LatLng(7.1942133, 80.5399448),
-          new window.google.maps.LatLng(7.1947473, 80.5402994)
+          new window.google.maps.LatLng(lowerLat, lowerLng),
+          new window.google.maps.LatLng(upperLat, upperLng)
         );
 
         const image = getImagePath(); // Get image based on the selected map type
+
+
+        // Extend max zoom level using MaxZoomService
+        const center = map.getCenter();
+        if (center) {
+          const maxZoomService = new window.google.maps.MaxZoomService();
+          maxZoomService.getMaxZoomAtLatLng(center, (response) => {
+            if (response.status === 'OK') {
+              const maxZoomLevel = response.zoom + 2; // Extend beyond the max zoom level by 2
+              const customMapType = new window.google.maps.ImageMapType({
+                getTileUrl: function (coord, zoom) {
+                  return `http://mt.google.com/vt/lyrs=s&x=${coord.x}&y=${coord.y}&z=${zoom}`;
+                },
+                tileSize: new window.google.maps.Size(256, 256),
+                maxZoom: maxZoomLevel,
+                name: 'Extended Zoom',
+              });
+
+              map.mapTypes.set('extended_zoom', customMapType);
+              map.setMapTypeId('extended_zoom');
+            }
+          });
+        }
+
+        // Loop through each IoT device and add a marker for each
+
+        iotDeviceList.forEach((device, index) => {
+          const { currentLatitude, currentLongitude, deviceCode } = device;
+
+          const markerPosition = {
+            lat: currentLatitude,
+            lng: currentLongitude,
+          };
+
+          // Create a marker and store its reference
+          const marker = new window.google.maps.Marker({
+            position: markerPosition,
+            map: iotEnabled ? map : null, // Show or hide based on IoT toggle state
+            title: `IoT Device: ${deviceCode}`,
+            icon: {
+              url: '../../src/assets/markers/iot-marker.png',
+              scaledSize: new window.google.maps.Size(40, 40),
+            },
+            zIndex: 1, // Ensure marker stays on top
+          });
+
+        // Store the reference of the marker
+        markerRefs.current[index] = marker;
+
+        const infoWindow = new window.google.maps.InfoWindow({
+          content: `<div>
+            <h3>IoT Device: ${deviceCode}</h3>
+            <p>Location: (${currentLatitude}, ${currentLongitude})</p>
+            <p>Status: Active</p>
+            <p>Last Modified: ${device.lastModifiedDate}</p>
+          </div>`,
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open(map, marker);
+        });
+      });
 
         // Image overlay class for the grid
         class CustomOverlay extends window.google.maps.OverlayView {
@@ -244,20 +336,22 @@ const MapDashboard: React.FC = () => {
 
     if (!window.google || !window.google.maps) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBKwT3-cq00IaM04TcHh1UiePAgjbp9LN4&callback=initMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&callback=initMap`;
       script.async = true;
       document.head.appendChild(script);
       window.initMap = initMap;
     } else {
       initMap();
     }
-  }, [isStressActive, isDiseaseActive, isYieldActive, iotEnabled, mapType, mapImageUrl]); // Re-run when any of the states change
+  }, [isStressActive, isDiseaseActive, isYieldActive, iotEnabled, iotDeviceList, mapType, mapImageUrl, geoCoordinates]); // Re-run when any of the states change
 
   // Update IoT marker visibility when iotEnabled changes
   useEffect(() => {
-    if (markerRef.current) {
-      markerRef.current.setMap(iotEnabled ? markerRef.current.getMap() : null);
-    }
+    markerRefs.current.forEach((marker) => {
+      if (marker) {
+        marker.setMap(iotEnabled ? marker.getMap() : null);
+      }
+    });
   }, [iotEnabled]);
 
   return (
