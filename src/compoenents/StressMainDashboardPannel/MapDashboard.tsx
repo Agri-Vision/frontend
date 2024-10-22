@@ -214,6 +214,9 @@
 // };
  
 // export default MapDashboard;
+
+
+//version 7
 import React, { useEffect, useRef } from 'react';
 import { useButtonContext } from '../ButtonContext'; // For Stress, Yield, and Disease toggle context
 import { useIoTContext } from '../IoTContext'; // For IoT toggle context
@@ -238,11 +241,11 @@ const MapDashboard: React.FC = () => {
   const getImagePath = () => {
     switch (mapType) {
       case 'ndvi':
-        return '../src/assets/maps/ndvi_map_overlay.png';
+        return '../src/assets/maps/NDVI_map.png';
       case 'rendvi':
-        return '../src/assets/maps/rendvi_map_overlay.png';
+        return '../src/assets/maps/RENDVI_map.png';
       default:
-        return '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png';
+        return 'https://agrivis.blob.core.windows.net/agrivis/1729533272348.png?sv=2021-08-06&spr=https&se=2034-10-21T17%3A54%3A45Z&sr=b&sp=r&sig=NDRIsjkS6n%2Fkak42rFikql56sb1cqFRMTADOGUR33UI%3D&rsct=text%2Fplain';
     }
   };
 
@@ -373,10 +376,10 @@ const MapDashboard: React.FC = () => {
 
         // Array of values for each grid block
         const blockValues = [
-          ['Yeild- 0 ,Stress- 0, Disease- 0', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 10 ,Stress- no, Disease- no', 'Yeild- 0 ,Stress- no, Disease- no'],
-          ['Yeild- 5 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- Yes', 'Yeild- 30 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 5 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- Yes, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
-          ['Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- Yes', 'Yeild- 20 ,Stress- no, Disease- no', 'Yeild- 20 ,Stress- no, Disease- no'],
+          ['B01 - Stress- 0', 'B02 - Stress- no', 'B03 - Stress- no', 'B04 - Stress- no'],
+          ['B05 - Stress- no', 'B06 - Stress- Yes', 'B07 - Stress- no', 'B08 - Stress- no'],
+          ['B07 - Stress- Yes', 'B08 - Stress- Yes', 'B09 - Stress- no', 'B10 - Stress- no'],
+          ['B11 - Stress- no', 'B12 - Stress- no', 'B13 - Stress- no', 'B14 - Stress- no'],
         ];
 
         // Grid overlay with hover, stress, yield, and disease logic
@@ -506,5 +509,186 @@ const MapDashboard: React.FC = () => {
 };
 
 export default MapDashboard;
+
+
+
+// //version 8
+// // export default MapDashboard;
+// import React, { useEffect, useRef, useState } from 'react';
+// import { useButtonContext } from '../ButtonContext'; // For Stress, Yield, and Disease toggle context
+// import { useIoTContext } from '../IoTContext'; // For IoT toggle context
+// import { useMapTypeContext } from '../MapTypeContext'; // For MapTypeContext
+// import { fromUrl } from 'geotiff'; // Import geotiff.js
+
+// const geoTiffPath = '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB.tif';
+
+// const MapDashboard: React.FC = () => {
+//   const mapRef = useRef<HTMLDivElement | null>(null);
+//   const markerRef = useRef<any>(null);  // Store the marker reference
+//   const overlayRef = useRef<any>(null);
+//   const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+//   const { isStressActive, isDiseaseActive, isYieldActive } = useButtonContext(); // Access stress, yield, and disease state from context
+//   const { iotEnabled } = useIoTContext(); // Access IoT marker toggle state
+//   const { mapType } = useMapTypeContext(); // Access map type from context
+
+//   // Function to convert GeoTIFF to PNG and extract geo-coordinates
+//   const convertGeoTiffToPng = async () => {
+//     try {
+//       const tiff = await fromUrl(geoTiffPath);
+//       const image = await tiff.getImage();
+//       const width = image.getWidth();
+//       const height = image.getHeight();
+//       const rasterData = await image.readRasters();
+
+//       // Convert raster data to image
+//       const canvas = document.createElement('canvas');
+//       canvas.width = width;
+//       canvas.height = height;
+//       const ctx = canvas.getContext('2d');
+//       const imgData = ctx.createImageData(width, height);
+
+//       // Assuming it's RGB, GeoTIFFs have many types; may need to adapt this
+//       for (let i = 0; i < rasterData[0].length; i++) {
+//         imgData.data[i * 4] = rasterData[0][i]; // Red
+//         imgData.data[i * 4 + 1] = rasterData[1][i]; // Green
+//         imgData.data[i * 4 + 2] = rasterData[2][i]; // Blue
+//         imgData.data[i * 4 + 3] = 255; // Alpha
+//       }
+//       ctx.putImageData(imgData, 0, 0);
+
+//       setImageSrc(canvas.toDataURL());
+
+//       const geoTransform = image.getGeoKeys();
+//       const origin = {
+//         lat: geoTransform.ModelTiepoint[4],
+//         lng: geoTransform.ModelTiepoint[3],
+//       };
+//       const pixelSize = {
+//         x: geoTransform.ModelPixelScale[0],
+//         y: geoTransform.ModelPixelScale[1],
+//       };
+//       const bounds = {
+//         sw: {
+//           lat: origin.lat + height * pixelSize.y,
+//           lng: origin.lng,
+//         },
+//         ne: {
+//           lat: origin.lat,
+//           lng: origin.lng + width * pixelSize.x,
+//         },
+//       };
+
+//       console.log('Extracted Geo-coordinates:', bounds);
+//       return bounds;
+//     } catch (error) {
+//       console.error('Error processing GeoTIFF:', error);
+//       return null;
+//     }
+//   };
+
+//   useEffect(() => {
+//     const initialize = async () => {
+//       const bounds = await convertGeoTiffToPng(); // Convert GeoTIFF to PNG and extract bounds
+
+//       const initMap = () => {
+//         if (mapRef.current && bounds) {
+//           const map = new window.google.maps.Map(mapRef.current, {
+//             zoom: 20,
+//             center: {
+//               lat: (bounds.ne.lat + bounds.sw.lat) / 2,
+//               lng: (bounds.ne.lng + bounds.sw.lng) / 2,
+//             },
+//             mapTypeId: 'satellite',
+//           });
+
+//           if (imageSrc) {
+//             // Add image overlay on the map
+//             class CustomOverlay extends window.google.maps.OverlayView {
+//               bounds: any;
+//               image: string;
+//               div: HTMLDivElement | null = null;
+
+//               constructor(bounds: any, image: string) {
+//                 super();
+//                 this.bounds = bounds;
+//                 this.image = image;
+//               }
+
+//               onAdd() {
+//                 this.div = document.createElement('div');
+//                 this.div.style.borderStyle = 'none';
+//                 this.div.style.borderWidth = '0px';
+//                 this.div.style.position = 'absolute';
+
+//                 const img = document.createElement('img');
+//                 img.src = this.image;
+//                 img.style.width = '100%';
+//                 img.style.height = '100%';
+//                 img.style.position = 'absolute';
+//                 this.div.appendChild(img);
+
+//                 const panes = this.getPanes();
+//                 if (panes && panes.overlayLayer) {
+//                   panes.overlayLayer.appendChild(this.div);
+//                 }
+//               }
+
+//               draw() {
+//                 if (!this.div) return;
+
+//                 const overlayProjection = this.getProjection();
+//                 const sw = overlayProjection.fromLatLngToDivPixel(new window.google.maps.LatLng(bounds.sw.lat, bounds.sw.lng));
+//                 const ne = overlayProjection.fromLatLngToDivPixel(new window.google.maps.LatLng(bounds.ne.lat, bounds.ne.lng));
+
+//                 if (sw && ne && this.div) {
+//                   this.div.style.left = `${sw.x}px`;
+//                   this.div.style.top = `${ne.y}px`;
+//                   this.div.style.width = `${ne.x - sw.x}px`;
+//                   this.div.style.height = `${sw.y - ne.y}px`;
+//                 }
+//               }
+//             }
+
+//             const overlay = new CustomOverlay(bounds, imageSrc);
+//             overlay.setMap(map);
+//             overlayRef.current = overlay;
+//           }
+//         }
+//       };
+
+//       if (!window.google || !window.google.maps) {
+//         const script = document.createElement('script');
+//         script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBKwT3-cq00IaM04TcHh1UiePAgjbp9LN4&callback=initMap`;
+//         script.async = true;
+//         document.head.appendChild(script);
+//         window.initMap = initMap;
+//       } else {
+//         initMap();
+//       }
+//     };
+
+//     initialize();
+//   }, [isStressActive, isDiseaseActive, isYieldActive, iotEnabled, mapType, imageSrc]); // Re-run when any of the states change
+
+//   // Update IoT marker visibility when iotEnabled changes
+//   useEffect(() => {
+//     if (markerRef.current) {
+//       markerRef.current.setMap(iotEnabled ? markerRef.current.getMap() : null);
+//     }
+//   }, [iotEnabled]);
+
+//   return (
+//     <div>
+//       <div ref={mapRef} style={{ height: '70vh', width: '100%' }} />
+//       <input type="file" accept=".tif,.tiff" onChange={(e) => { if (e.target.files[0]) convertGeoTiffToPng(); }} />
+//       {imageSrc && <img src={imageSrc} alt="Converted GeoTIFF" />}
+//     </div>
+//   );
+// };
+
+// export default MapDashboard;
+
+
 
 
