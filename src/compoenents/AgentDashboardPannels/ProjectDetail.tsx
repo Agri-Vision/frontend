@@ -11,15 +11,14 @@ interface IoTDevice {
 }
 
 const ProjectDetail: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
-  console.log()
-  console.log(projectId)
+  const { projectId } = useParams<{ projectId: string }>(); // Retrieve the project ID from URL
   const [projectDetails, setProjectDetails] = useState<any>(null);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [iotDevices, setIoTDevices] = useState<IoTDevice[]>([{ id: '', latitude: '', longitude: '' }]);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Fetch project details from the backend
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
@@ -66,6 +65,7 @@ const ProjectDetail: React.FC = () => {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
+      console.log('Uploaded images:', files.map(file => file.name));
       setUploadedImages(prevImages => [...prevImages, ...files]);
     }
   };
@@ -77,6 +77,7 @@ const ProjectDetail: React.FC = () => {
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
+    console.log('Dropped images:', files.map(file => file.name));
     setUploadedImages(prevImages => [...prevImages, ...files]);
   };
 
@@ -115,12 +116,78 @@ const ProjectDetail: React.FC = () => {
     }
 
     try {
+      // Step 1: Obtain Authorization Token
+      const tokenResponse = await axios.post('http://localhost:8000/api/token-auth/', {
+        // username: 'prathila01@gmail.com',
+        // password: '12345678'
+        username: 'DinukaKariyawasam',
+        password: 'test'
+      });
+      const token = tokenResponse.data.token;
+
+      // Step 2: Create a New Project in WebODM
+      const projectResponse = await axios.post('http://localhost:8000/api/projects/', {
+        name: projectDetails.projectName // Use the project name from details
+      }, {
+        headers: {
+          Authorization: `JWT ${token}`
+        }
+      });
+      const newProjectId = projectResponse.data.id;
+
+      // Step 3: Categorize Images by Bands
       const categorizedImages = categorizeImages(uploadedImages);
-      // Placeholder for image uploading and creating tasks logic
-      setMessage({ type: 'success', text: 'Project and tasks updated successfully!' });
-    } catch (error) {
-      console.error('Error updating project:', error);
-      setMessage({ type: 'error', text: 'Failed to update the project. Please try again.' });
+
+      // Step 4: Create Tasks for Each Band of Images
+      const createTaskForBand = async (bandName: string, images: File[]) => {
+        if (images.length < 3) {
+          console.warn(`Not enough images for band: ${bandName}`);
+          return;
+        }
+
+        const formData = new FormData();
+        images.forEach((image) => {
+          formData.append('images', image, image.name);
+        });
+
+        // Add options to the formData
+        const options = JSON.stringify([
+          { "name": "orthophoto-resolution", "value": 2.0 },
+          { "name": "auto-boundary", "value": true },
+          { "name": "dsm", "value": true },
+          { "name": "pc-quality", "value": "high" },
+          { "name": "dem-resolution", "value": 2.0 }
+        ]);
+
+        formData.append('options', options);
+
+        try {
+          const taskResponse = await axios.post(`http://localhost:8000/api/projects/${newProjectId}/tasks/`, formData, {
+            headers: {
+              Authorization: `JWT ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          console.log(`Task created for band ${bandName}:`, taskResponse.data);
+        } catch (taskError: any) {
+          console.error(`Error creating task for band ${bandName}:`, taskError.response ? taskError.response.data : taskError.message);
+          throw new Error(`Error creating task for band ${bandName}`);
+        }
+      };
+
+      // Create Tasks for Each Band
+      await Promise.all([
+        createTaskForBand('RGB', categorizedImages.RGB),
+        createTaskForBand('R', categorizedImages.R),
+        createTaskForBand('NIR', categorizedImages.NIR),
+        createTaskForBand('RE', categorizedImages.RE),
+        createTaskForBand('G', categorizedImages.G),
+      ]);
+
+      setMessage({ type: 'success', text: 'Project and tasks created successfully!' });
+    } catch (error: any) {
+      console.error('Error creating project or tasks:', error.message);
+      setMessage({ type: 'error', text: 'Failed to create project or tasks. Please try again.' });
     }
   };
 
@@ -131,19 +198,25 @@ const ProjectDetail: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             {projectDetails.projectName}
           </Typography>
+
           {message && (
             <Typography variant="body1" sx={{ color: message.type === 'success' ? 'green' : 'red', marginBottom: 2 }}>
               {message.text}
             </Typography>
           )}
+
           <Grid container spacing={3}>
+            {/* Project Info */}
             <Grid item xs={12} md={8}>
               <Paper sx={{ padding: 3 }}>
                 <Typography variant="h6">Owner: {projectDetails.agent.firstName} {projectDetails.agent.lastName}</Typography>
                 <Typography variant="body1">Assigned Date: {new Date(projectDetails.createdDate).toLocaleString()}</Typography>
                 <Typography variant="body1">Status: {projectDetails.status}</Typography>
+                <Typography variant="body1">Instructions: {projectDetails.instructions}</Typography>
               </Paper>
             </Grid>
+
+            {/* Project Images */}
             <Grid item xs={12} md={4}>
               <Paper sx={{ padding: 3 }}>
                 <Typography variant="h6" gutterBottom>Plantation Images</Typography>
@@ -158,6 +231,8 @@ const ProjectDetail: React.FC = () => {
                 </Box>
               </Paper>
             </Grid>
+
+            {/* Image Upload */}
             <Grid item xs={12}>
               <Box
                 onDragOver={handleDragOver}
@@ -166,7 +241,7 @@ const ProjectDetail: React.FC = () => {
                   border: '2px dashed grey',
                   padding: 3,
                   textAlign: 'center',
-                  maxHeight: '400px',
+                  maxHeight: '400px', // Limit height for scroll
                   overflowY: 'auto',
                 }}
               >
@@ -190,6 +265,8 @@ const ProjectDetail: React.FC = () => {
                 </Box>
               </Box>
             </Grid>
+
+            {/* IoT Devices */}
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom>IoT Devices</Typography>
               {iotDevices.map((device, index) => (
@@ -231,17 +308,14 @@ const ProjectDetail: React.FC = () => {
                 Add IoT Device
               </Button>
             </Grid>
+
+            {/* Confirmation and Submit */}
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={isConfirmed} onChange={handleConfirmChange} />}
                 label="I confirm that all the details are correct"
               />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-                disabled={!isConfirmed}
-              >
+              <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!isConfirmed}>
                 Submit
               </Button>
             </Grid>
