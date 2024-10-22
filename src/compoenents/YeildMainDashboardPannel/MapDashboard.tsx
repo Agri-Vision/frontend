@@ -214,6 +214,9 @@
 // };
  
 // export default MapDashboard;
+
+
+
 import React, { useEffect, useRef } from 'react';
 import { useButtonContext } from '../ButtonContext'; // For Stress, Yield, and Disease toggle context
 import { useIoTContext } from '../IoTContext'; // For IoT toggle context
@@ -221,18 +224,25 @@ import { useMapTypeContext } from '../MapTypeContext'; // For MapTypeContext
 
 declare global {
   interface Window {
-    initMap: () => void;  // Extend the Window interface
+    initMap: () => void; // Extend the Window interface
   }
 }
 
 const MapDashboard: React.FC = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
-  const markerRef = useRef<any>(null);  // Store the marker reference
+  const markerRef = useRef<any>(null); // Store the marker reference
   const overlayRef = useRef<any>(null);
 
   const { isStressActive, isDiseaseActive, isYieldActive } = useButtonContext(); // Access stress, yield, and disease state from context
   const { iotEnabled } = useIoTContext(); // Access IoT marker toggle state
   const { mapType } = useMapTypeContext(); // Access map type from context
+
+  // Hardcoded rows, cols, and block values for dynamic grid
+  const numRows = 8; // Example number of rows
+  const numCols = 8; // Example number of columns
+  const blockValues = Array.from({ length: numRows }, (_, rowIndex) =>
+    Array.from({ length: numCols }, (_, colIndex) => `B${rowIndex * numCols + colIndex + 1} Yield- ${Math.floor(Math.random() * 30)}`)
+  );
 
   // Dynamically set image path based on selected map type
   const getImagePath = () => {
@@ -242,7 +252,7 @@ const MapDashboard: React.FC = () => {
       case 'rendvi':
         return '../src/assets/maps/RENDVI_map.png';
       default:
-        return '../src/assets/maps/Gonadika-Holiday-Bungalow-RGB-png.png';
+        return 'https://agrivis.blob.core.windows.net/agrivis/1729533272348.png?sv=2021-08-06&spr=https&se=2034-10-21T17%3A54%3A45Z&sr=b&sp=r&sig=NDRIsjkS6n%2Fkak42rFikql56sb1cqFRMTADOGUR33UI%3D&rsct=text%2Fplain';
     }
   };
 
@@ -259,66 +269,18 @@ const MapDashboard: React.FC = () => {
         const map = new window.google.maps.Map(mapRef.current, {
           zoom: 20,
           center: {
-            lat: (7.1947473 + 7.1942133) / 2,
-            lng: (80.5402994 + 80.5399448) / 2,
+            lat: (7.194747257192233 + 7.1942131103952525) / 2,
+            lng: (80.54030064103151 + 80.53994367657067) / 2,
           },
           mapTypeId: 'satellite',
         });
 
         const bounds = new window.google.maps.LatLngBounds(
-          new window.google.maps.LatLng(7.1942133, 80.5399448),
-          new window.google.maps.LatLng(7.1947473, 80.5402994)
+          new window.google.maps.LatLng(7.1942131103952525, 80.53994367657067),
+          new window.google.maps.LatLng(7.194747257192233, 80.54030064103151)
         );
 
         const image = getImagePath(); // Get image based on the selected map type
-
-        // Extend max zoom level using MaxZoomService
-        const center = map.getCenter();
-        if (center) {
-          const maxZoomService = new window.google.maps.MaxZoomService();
-          maxZoomService.getMaxZoomAtLatLng(center, (response) => {
-            if (response.status === 'OK') {
-              const maxZoomLevel = response.zoom + 2; // Extend beyond the max zoom level by 2
-              const customMapType = new window.google.maps.ImageMapType({
-                getTileUrl: function (coord, zoom) {
-                  return `http://mt.google.com/vt/lyrs=s&x=${coord.x}&y=${coord.y}&z=${zoom}`;
-                },
-                tileSize: new window.google.maps.Size(256, 256),
-                maxZoom: maxZoomLevel,
-                name: 'Extended Zoom',
-              });
-
-              map.mapTypes.set('extended_zoom', customMapType);
-              map.setMapTypeId('extended_zoom');
-            }
-          });
-        }
-
-        // Add marker for the IoT device
-        const markerPosition = {
-          lat: 7.19448,
-          lng: 80.5401,
-        };
-
-        // Create marker and store its reference
-        markerRef.current = new window.google.maps.Marker({
-          position: markerPosition,
-          map: iotEnabled ? map : null, // Show or hide based on IoT toggle state
-          title: 'IoT Device Location',
-          icon: {
-            url: '../src/assets/markers/iot-marker.png',
-            scaledSize: new window.google.maps.Size(40, 40),
-          },
-          zIndex: 1, // Ensure marker stays on top
-        });
-
-        const infoWindow = new window.google.maps.InfoWindow({
-          content: `<div><h3>IoT Device</h3><p>Location: (${markerPosition.lat}, ${markerPosition.lng})</p><p>Status: Active</p></div>`,
-        });
-
-        markerRef.current.addListener('click', () => {
-          infoWindow.open(map, markerRef.current);
-        });
 
         // Image overlay class for the grid
         class CustomOverlay extends window.google.maps.OverlayView {
@@ -371,15 +333,7 @@ const MapDashboard: React.FC = () => {
         overlay.setMap(map);
         overlayRef.current = overlay;
 
-        // Array of values for each grid block
-        const blockValues = [
-          ['B01 Yeild- 0', 'B02 Yeild- 20', 'B03 Yeild- 10', 'B04 Yeild- 0'],
-          ['B05 Yeild- 5 ', 'B06 Yeild- 20', 'B07 Yeild- 30 ', 'B08 Yeild- 20 '],
-          ['B09 Yeild- 5 ', 'B10 Yeild- 20 ', 'B11 Yeild- 20 ', 'B12 Yeild- 20 '],
-          ['B13 Yeild- 20 ', 'B14 Yeild- 20 ', 'B15 Yeild- 20 ', 'B16 Yeild- 20 '],
-        ];
-
-        // Grid overlay with hover, stress, yield, and disease logic
+        // Grid overlay with dynamic row and column logic
         class GridOverlay extends window.google.maps.OverlayView {
           div: HTMLDivElement | null = null;
           bounds: any;
@@ -399,23 +353,23 @@ const MapDashboard: React.FC = () => {
               panes.overlayMouseTarget.appendChild(this.div);
             }
 
-            // Create grid blocks within the bounds of the image overlay
-            for (let i = 0; i < 4; i++) {
-              for (let j = 0; j < 4; j++) {
+            // Create grid blocks dynamically
+            for (let i = 0; i < numRows; i++) {
+              for (let j = 0; j < numCols; j++) {
                 const block = document.createElement('div');
                 block.style.position = 'absolute';
                 block.style.backgroundColor = 'transparent';
                 block.style.border = '0px solid #000';
-                block.style.width = '25%';
-                block.style.height = '25%';
-                block.style.left = `${i * 25}%`;
-                block.style.top = `${j * 25}%`;
+                block.style.width = `${100 / numCols}%`;
+                block.style.height = `${100 / numRows}%`;
+                block.style.left = `${j * (100 / numCols)}%`;
+                block.style.top = `${i * (100 / numRows)}%`;
                 block.style.zIndex = '0'; // Ensure grid blocks are behind markers
 
                 const blockValue = blockValues[i][j];
                 const isStress = blockValue.includes('Stress- Yes');
                 const isDisease = blockValue.includes('Disease- Yes');
-                const yieldMatch = blockValue.match(/Yeild- (\d+)/);
+                const yieldMatch = blockValue.match(/Yield- (\d+)/);
                 const yieldValue = yieldMatch ? parseInt(yieldMatch[1], 10) : 0;
 
                 // If stress is active and the block contains "Stress- Yes", set the background to red
@@ -506,5 +460,6 @@ const MapDashboard: React.FC = () => {
 };
 
 export default MapDashboard;
+
 
 

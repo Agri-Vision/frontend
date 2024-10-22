@@ -15,7 +15,7 @@ import ProjectDetail from "../compoenents/AgentDashboardPannels/ProjectDetail";
 import { NotFoundPage } from "../pages/NotFound";
 import { Loading } from "../pages/Loading";
 
-import Hometest from "../pages/HomeTest";
+import CustomerHome from "../pages/CustomerHome";
 
 const IndexRoutes: React.FC = () => {
     return (
@@ -23,7 +23,8 @@ const IndexRoutes: React.FC = () => {
             <Routes>
                 <Route path="/home" element={<BaseLayout />}>
                     <Route index element={<Navigate to="/home" />} />
-                    <Route path="customer-main-detail" element={<CustomerMainDetail />} />
+                    <Route path="customer-main-detail/:id" element={<CustomerMainDetail />} />
+                    {/* <Route path="customer-main-detail" element={<CustomerMainDetail />} /> */}
                     <Route path="stress-dashboard" element={<StressMainDashboard />} />
                     <Route path="yeild-dashboard" element={<YeildMainDashboard />} />
                     <Route path="disease-dashboard" element={<DiseaseMainDashboard />} />
@@ -31,7 +32,7 @@ const IndexRoutes: React.FC = () => {
                     <Route path="agent-dashboard/project/:id" element={<ProjectDetail />} />
                     <Route path="example1" element={<Example1 />} />  
 
-                    <Route path="home-test" element={<Hometest />} />                  
+                    <Route path="customer-home" element={<CustomerHome />} />                  
                 </Route>
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/NotFoundPage" element={<NotFoundPage />} />
