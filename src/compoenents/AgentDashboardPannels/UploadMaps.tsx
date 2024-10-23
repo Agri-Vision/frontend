@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Grid, Paper, IconButton } from '@mui/material';
+import { Box, Typography, Button, Grid, Paper, IconButton, Alert } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -29,6 +29,8 @@ const UploadMaps: React.FC = () => {
     reMap: null,
     nirMap: null,
   });
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -37,6 +39,8 @@ const UploadMaps: React.FC = () => {
         setProjectDetails(response.data);
       } catch (error) {
         console.error('Error fetching project details:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -46,13 +50,17 @@ const UploadMaps: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, mapType: string) => {
     const file = event.target.files?.[0];
     if (file) {
+      const taskType = mapType.replace('Map', '').toUpperCase();
+      const newFileName = `${file.name.replace(/\.[^/.]+$/, '')}_${taskType}${file.name.match(/\.[^/.]+$/)?.[0] || ''}`;
+      const renamedFile = new File([file], newFileName, { type: file.type });
+
       setMapFiles((prev) => ({
         ...prev,
-        [mapType]: file,
+        [mapType]: renamedFile,
       }));
       setUploadedPreviews((prev) => ({
         ...prev,
-        [mapType]: URL.createObjectURL(file),
+        [mapType]: URL.createObjectURL(renamedFile),
       }));
     }
   };
@@ -80,31 +88,37 @@ const UploadMaps: React.FC = () => {
     try {
       const response = await axios.put(`http://localhost:8080/project/maps/${projectId}`, formData);
       console.log('Upload successful:', response.data);
+      setMessage({ type: 'success', text: 'Maps uploaded successfully!' });
     } catch (error) {
       console.error('Error uploading maps:', error);
+      setMessage({ type: 'error', text: 'Failed to upload maps. Please try again.' });
     }
   };
 
-  if (!projectDetails) {
+  if (loading) {
     return <Typography>Loading project details...</Typography>;
+  }
+
+  if (!projectDetails) {
+    return <Typography variant="body1" color="error">Failed to load project details.</Typography>;
   }
 
   const { webOdmProjectId, taskList, agent } = projectDetails;
 
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
         Upload Maps for Project: {projectDetails.projectName}
       </Typography>
-      <Typography variant="body1">
-        WebODM Project ID: {webOdmProjectId || 'Not Available'}
+      <Typography variant="body1" gutterBottom>
+        WebODM Project ID: <strong>{webOdmProjectId || 'Not Available'}</strong>
       </Typography>
-      <Typography variant="body1">
-        Project Status: {projectDetails.status}
+      <Typography variant="body1" gutterBottom>
+        Project Status: <strong>{projectDetails.status}</strong>
       </Typography>
       {agent ? (
         <Typography variant="body1" gutterBottom>
-          Assigned to: {agent.firstName} {agent.lastName}
+          Assigned to: <strong>{agent.firstName} {agent.lastName}</strong>
         </Typography>
       ) : (
         <Typography variant="body1" color="error" gutterBottom>
@@ -112,44 +126,61 @@ const UploadMaps: React.FC = () => {
         </Typography>
       )}
 
+      {message && (
+        <Alert severity={message.type} sx={{ mt: 2 }}>
+          {message.text}
+        </Alert>
+      )}
+
       {!taskList || taskList.length === 0 ? (
-        <Typography variant="body1" color="error">
+        <Typography variant="body1" color="error" sx={{ mt: 2 }}>
           WebODM project not created for this project.
         </Typography>
       ) : (
-        <Grid container spacing={2}>
+        <Grid container spacing={3} sx={{ mt: 2 }}>
           {taskList.map((task: Task) => (
             <Grid item xs={12} md={6} key={task.webOdmTaskId}>
-              <Paper sx={{ padding: 2, display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6">
+              <Paper sx={{
+                padding: 3,
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                borderRadius: '10px',
+                transition: 'transform 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                },
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                   {task.taskType} Task ID: {task.webOdmTaskId}
                 </Typography>
                 {task.lastModifiedDate && (
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 2 }}>
                     Last Modified: {new Date(task.lastModifiedDate).toLocaleString()}
                   </Typography>
                 )}
 
                 {uploadedPreviews[`${task.taskType.toLowerCase()}Map`] ? (
-                  <Box sx={{ position: 'relative', marginTop: 2, height: '200px' }}>
+                  <Box sx={{ position: 'relative', marginTop: 2, height: '200px', borderRadius: '8px', overflow: 'hidden' }}>
                     <img
                       src={uploadedPreviews[`${task.taskType.toLowerCase()}Map`] || ''}
                       alt={`${task.taskType} preview`}
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'contain', // Ensure the image is fully visible within the container
+                        objectFit: 'cover',
+                        borderRadius: '8px',
                       }}
                     />
                     <IconButton
-                      sx={{ position: 'absolute', top: 8, right: 8 }}
+                      sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(255, 255, 255, 0.7)' }}
                       onClick={() => handleRemoveImage(`${task.taskType.toLowerCase()}Map`)}
                     >
                       <DeleteIcon />
                     </IconButton>
                   </Box>
                 ) : (
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
                     No image uploaded yet.
                   </Typography>
                 )}
@@ -157,7 +188,7 @@ const UploadMaps: React.FC = () => {
                 <Button
                   variant="contained"
                   component="label"
-                  sx={{ marginTop: 2, width: '100%' }} // Full width button
+                  sx={{ marginTop: 2, borderRadius: '8px', padding: '10px' }}
                 >
                   Upload {task.taskType} Map
                   <input
@@ -176,7 +207,7 @@ const UploadMaps: React.FC = () => {
         variant="contained"
         color="primary"
         onClick={handleUpload}
-        sx={{ marginTop: 3, width: '100%' }} // Full width button for consistency
+        sx={{ marginTop: 3, width: '100%', padding: '12px', borderRadius: '8px' }}
         disabled={!taskList || taskList.length === 0}
       >
         Upload All Maps
