@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, IconButton, Grid, Card, CardContent, CardMedia } from '@mui/material';
+import { Box, Typography, IconButton, Grid, Card, CardContent, CardMedia, Button } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ interface ProjectSectionProps {
 const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects }) => {
     const navigate = useNavigate();
     const [currentIndex, setCurrentIndex] = useState(0);
-    const projectsToShow = 3; // Number of projects visible at a time
+    const projectsToShow = 4; // Number of projects visible at a time
 
     const handleNextSlide = () => {
         if (currentIndex < projects.length - projectsToShow) {
@@ -27,8 +27,11 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects }) => {
     };
 
     const handleCardClick = (projectId: string) => {
-        console.log("id",projectId);
         navigate(`project/${projectId}`);
+    };
+
+    const handleUploadMapsClick = (projectId: string) => {
+        navigate(`/upload-maps/${projectId}`);
     };
 
     return (
@@ -81,6 +84,19 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects }) => {
                                             </Typography>
                                             <Typography variant="body2">Status: {project.status}</Typography>
                                             <Typography variant="body2">Assigned on: {new Date(project.createdDate).toLocaleString()}</Typography>
+                                            {project.status === 'PENDING' && (
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    sx={{ marginTop: 2 }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleUploadMapsClick(project.id);
+                                                    }}
+                                                >
+                                                    Upload Maps
+                                                </Button>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 </Grid>

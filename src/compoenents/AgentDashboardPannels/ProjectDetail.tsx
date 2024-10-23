@@ -6,17 +6,19 @@ import axios from 'axios';
 
 interface IoTDevice {
   id: string;
-  latitude: string;
-  longitude: string;
+  currentLatitude: string;
+  currentLongitude: string;
 }
 
 const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>(); // Retrieve the project ID from URL
   const [projectDetails, setProjectDetails] = useState<any>(null);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
-  const [iotDevices, setIoTDevices] = useState<IoTDevice[]>([{ id: '', latitude: '', longitude: '' }]);
+  const [iotDevices, setIoTDevices] = useState<IoTDevice[]>([{ id: '', currentLatitude: '', currentLongitude: '' }]);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [webOdmProjectId, setWebOdmProjectId] = useState<string>('');
+  const [taskList, setTaskList] = useState<any[]>([]);
 
   // Fetch project details from the backend
   useEffect(() => {
@@ -24,6 +26,9 @@ const ProjectDetail: React.FC = () => {
       try {
         const response = await axios.get(`http://localhost:8080/project/${projectId}`);
         setProjectDetails(response.data);
+        setWebOdmProjectId(response.data.webOdmProjectId || '');
+        setIoTDevices(response.data.iotDeviceList || []);
+        setTaskList(response.data.taskList || []);
       } catch (error) {
         console.error('Error fetching project details:', error);
       }
@@ -88,7 +93,7 @@ const ProjectDetail: React.FC = () => {
   };
 
   const handleAddIoTDevice = () => {
-    setIoTDevices([...iotDevices, { id: '', latitude: '', longitude: '' }]);
+    setIoTDevices([...iotDevices, { id: '', currentLatitude: '', currentLongitude: '' }]);
   };
 
   const handleRemoveIoTDevice = (index: number) => {
@@ -118,8 +123,6 @@ const ProjectDetail: React.FC = () => {
     try {
       // Step 1: Obtain Authorization Token
       const tokenResponse = await axios.post('http://localhost:8000/api/token-auth/', {
-        // username: 'prathila01@gmail.com',
-        // password: '12345678'
         username: 'DinukaKariyawasam',
         password: 'test'
       });
@@ -127,18 +130,21 @@ const ProjectDetail: React.FC = () => {
 
       // Step 2: Create a New Project in WebODM
       const projectResponse = await axios.post('http://localhost:8000/api/projects/', {
-        name: projectDetails.projectName // Use the project name from details
+        name: projectDetails.projectName
       }, {
         headers: {
           Authorization: `JWT ${token}`
         }
       });
-      const newProjectId = projectResponse.data.id;
+      const newWebOdmProjectId = projectResponse.data.id;
+      setWebOdmProjectId(newWebOdmProjectId);
 
       // Step 3: Categorize Images by Bands
       const categorizedImages = categorizeImages(uploadedImages);
 
       // Step 4: Create Tasks for Each Band of Images
+      const createdTasks: any[] = [];
+
       const createTaskForBand = async (bandName: string, images: File[]) => {
         if (images.length < 3) {
           console.warn(`Not enough images for band: ${bandName}`);
@@ -150,7 +156,6 @@ const ProjectDetail: React.FC = () => {
           formData.append('images', image, image.name);
         });
 
-        // Add options to the formData
         const options = JSON.stringify([
           { "name": "orthophoto-resolution", "value": 2.0 },
           { "name": "auto-boundary", "value": true },
@@ -162,20 +167,25 @@ const ProjectDetail: React.FC = () => {
         formData.append('options', options);
 
         try {
-          const taskResponse = await axios.post(`http://localhost:8000/api/projects/${newProjectId}/tasks/`, formData, {
+          const taskResponse = await axios.post(`http://localhost:8000/api/projects/${newWebOdmProjectId}/tasks/`, formData, {
             headers: {
               Authorization: `JWT ${token}`,
               'Content-Type': 'multipart/form-data'
             }
           });
           console.log(`Task created for band ${bandName}:`, taskResponse.data);
+          createdTasks.push({
+            // id: taskResponse.data.id,
+            webOdmTaskId: taskResponse.data.id,
+            taskType: bandName,
+            // mapImage: taskResponse.data.mapImage, // Assuming mapImage is part of the response
+          });
         } catch (taskError: any) {
           console.error(`Error creating task for band ${bandName}:`, taskError.response ? taskError.response.data : taskError.message);
           throw new Error(`Error creating task for band ${bandName}`);
         }
       };
 
-      // Create Tasks for Each Band
       await Promise.all([
         createTaskForBand('RGB', categorizedImages.RGB),
         createTaskForBand('R', categorizedImages.R),
@@ -184,10 +194,40 @@ const ProjectDetail: React.FC = () => {
         createTaskForBand('G', categorizedImages.G),
       ]);
 
+      setTaskList(createdTasks);
       setMessage({ type: 'success', text: 'Project and tasks created successfully!' });
+
+      // Automatically update the project after successful submission
+    await handleUpdateProject();
     } catch (error: any) {
       console.error('Error creating project or tasks:', error.message);
       setMessage({ type: 'error', text: 'Failed to create project or tasks. Please try again.' });
+    }
+  };
+
+  const handleUpdateProject = async () => {
+    if (!isConfirmed) {
+      setMessage({ type: 'error', text: 'Please confirm the details before updating.' });
+      return;
+    }
+
+    const updateData = {
+      ...projectDetails,
+      webOdmProjectId,
+      iotDeviceList: iotDevices.map((device) => ({
+        ...device,
+        deviceCode: `IOT-SENSOR-${device.id}`
+      })),
+      taskList: taskList
+    };
+
+    try {
+      const response = await axios.put('http://localhost:8080/project', updateData);
+      console.log('Project updated:', response.data);
+      setMessage({ type: 'success', text: 'Project updated successfully!' });
+    } catch (error) {
+      console.error('Error updating project:', error);
+      setMessage({ type: 'error', text: 'Failed to update project. Please try again.' });
     }
   };
 
@@ -210,9 +250,10 @@ const ProjectDetail: React.FC = () => {
             <Grid item xs={12} md={8}>
               <Paper sx={{ padding: 3 }}>
                 <Typography variant="h6">Owner: {projectDetails.agent.firstName} {projectDetails.agent.lastName}</Typography>
-                <Typography variant="body1">Assigned Date: {new Date(projectDetails.createdDate).toLocaleString()}</Typography>
+                <Typography variant="body1">
+                  Assigned Date: {new Date(projectDetails.createdDate).toLocaleString()}
+                </Typography>
                 <Typography variant="body1">Status: {projectDetails.status}</Typography>
-                <Typography variant="body1">Instructions: {projectDetails.instructions}</Typography>
               </Paper>
             </Grid>
 
@@ -241,7 +282,7 @@ const ProjectDetail: React.FC = () => {
                   border: '2px dashed grey',
                   padding: 3,
                   textAlign: 'center',
-                  maxHeight: '400px', // Limit height for scroll
+                  maxHeight: '400px',
                   overflowY: 'auto',
                 }}
               >
@@ -282,16 +323,16 @@ const ProjectDetail: React.FC = () => {
                   <Grid item xs={12} sm={3}>
                     <TextField
                       label="Latitude"
-                      value={device.latitude}
-                      onChange={(e) => handleIoTDeviceChange(index, 'latitude', e.target.value)}
+                      value={device.currentLatitude}
+                      onChange={(e) => handleIoTDeviceChange(index, 'currentLatitude', e.target.value)}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={12} sm={3}>
                     <TextField
                       label="Longitude"
-                      value={device.longitude}
-                      onChange={(e) => handleIoTDeviceChange(index, 'longitude', e.target.value)}
+                      value={device.currentLongitude}
+                      onChange={(e) => handleIoTDeviceChange(index, 'currentLongitude', e.target.value)}
                       fullWidth
                     />
                   </Grid>
@@ -318,6 +359,9 @@ const ProjectDetail: React.FC = () => {
               <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!isConfirmed}>
                 Submit
               </Button>
+              {/* <Button variant="contained" color="secondary" onClick={handleUpdateProject} disabled={!isConfirmed} sx={{ marginLeft: 2 }}>
+                Update Project
+              </Button> */}
             </Grid>
           </Grid>
         </>
