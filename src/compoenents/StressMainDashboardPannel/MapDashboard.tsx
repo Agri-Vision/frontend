@@ -245,7 +245,7 @@ const MapDashboard: React.FC = () => {
       case 'rendvi':
         return '../src/assets/maps/RENDVI_map.png';
       default:
-        return 'https://agrivis.blob.core.windows.net/agrivis/1729533272348.png?sv=2021-08-06&spr=https&se=2034-10-21T17%3A54%3A45Z&sr=b&sp=r&sig=NDRIsjkS6n%2Fkak42rFikql56sb1cqFRMTADOGUR33UI%3D&rsct=text%2Fplain';
+        return 'https://agrivis.blob.core.windows.net/agrivis/1729534754989.png?sv=2021-08-06&spr=https&se=2034-10-21T18%3A19%3A25Z&sr=b&sp=r&sig=kBSya5oiD3VFuifz2p0OsgADv4eudN%2BZAMziemrUgno%3D&rsct=text%2Fplain';
     }
   };
 

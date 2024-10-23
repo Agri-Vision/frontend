@@ -19,7 +19,7 @@ interface Project {
   createdDate: string;
 }
 
-const Projects: React.FC = () => {
+const ProjectsPending: React.FC = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,7 +29,9 @@ const Projects: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/project/plantation/2`);
-        setProjects(response.data);
+        // Filter projects with status "PENDING"
+        const pendingProjects = response.data.filter((project: Project) => project.status === 'PENDING');
+        setProjects(pendingProjects);
       } catch (error) {
         console.error('Error fetching projects:', error);
       } finally {
@@ -80,4 +82,4 @@ const Projects: React.FC = () => {
   );
 };
 
-export default Projects;
+export default ProjectsPending;

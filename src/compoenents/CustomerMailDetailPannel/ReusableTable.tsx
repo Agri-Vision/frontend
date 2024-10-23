@@ -65,7 +65,7 @@ const ReusableTable: React.FC<TableProps> = ({ columns, data, recordsPerPage = 5
                   textTransform: 'uppercase',
                 }}
               >
-                Action
+                View
               </TableCell>
             </TableRow>
           </TableHead>
