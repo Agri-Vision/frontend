@@ -206,30 +206,25 @@ const ProjectDetail: React.FC = () => {
   };
 
   const handleUpdateProject = async () => {
-    if (!isConfirmed) {
-      setMessage({ type: 'error', text: 'Please confirm the details before updating.' });
-      return;
-    }
-
-    const updateData = {
-      ...projectDetails,
-      webOdmProjectId,
-      iotDeviceList: iotDevices.map((device) => ({
-        ...device,
-        deviceCode: `IOT-SENSOR-${device.id}`
-      })),
-      taskList: taskList
-    };
-
-    try {
-      const response = await axios.put('http://localhost:8080/project', updateData);
-      console.log('Project updated:', response.data);
-      setMessage({ type: 'success', text: 'Project updated successfully!' });
-    } catch (error) {
-      console.error('Error updating project:', error);
-      setMessage({ type: 'error', text: 'Failed to update project. Please try again.' });
-    }
+  const updateData = {
+    ...projectDetails,
+    webOdmProjectId,
+    iotDeviceList: iotDevices.map((device) => ({
+      ...device,
+      deviceCode: `IOT-SENSOR-${device.id}`
+    })),
+    taskList: taskList
   };
+
+  try {
+    const response = await axios.put('http://localhost:8080/project', updateData);
+    console.log('Project updated:', response.data);
+    setMessage({ type: 'success', text: 'Project updated successfully!' });
+  } catch (error) {
+    console.error('Error updating project:', error);
+    setMessage({ type: 'error', text: 'Failed to update project. Please try again.' });
+  }
+};
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -249,7 +244,7 @@ const ProjectDetail: React.FC = () => {
             {/* Project Info */}
             <Grid item xs={12} md={8}>
               <Paper sx={{ padding: 3 }}>
-                <Typography variant="h6">Owner: {projectDetails.agent.firstName} {projectDetails.agent.lastName}</Typography>
+                <Typography variant="h6">Assigned Agent: {projectDetails.agent.firstName} {projectDetails.agent.lastName}</Typography>
                 <Typography variant="body1">
                   Assigned Date: {new Date(projectDetails.createdDate).toLocaleString()}
                 </Typography>

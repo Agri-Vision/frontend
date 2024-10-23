@@ -15,6 +15,7 @@ import ProjectDetail from "../compoenents/AgentDashboardPannels/ProjectDetail";
 import AdminProjectCreation from "../compoenents/AdminDashboardPanels/AdminProjectCreation";
 import AdminDashboard from "../pages/AdminDashboard";
 import CreateOrganization from "../compoenents/AdminDashboardPanels/CreateOrganization";
+import UploadMaps from "../compoenents/AgentDashboardPannels/UploadMaps";
 
 import { NotFoundPage } from "../pages/NotFound";
 import { Loading } from "../pages/Loading";
@@ -31,6 +32,7 @@ const IndexRoutes: React.FC = () => {
                     <Route path="disease-dashboard" element={<DiseaseMainDashboard />} />
                     <Route path="agent-dashboard" element={<AgentDashboard />} />
                     <Route path="agent-dashboard/project/:projectId" element={<ProjectDetail />} />
+                    <Route path="agent-dashboard/upload-map/:projectId" element={<UploadMaps />} />
                     <Route path="admin-dashboard" element={<AdminDashboard />} />
                     <Route path="admin-dashboard/project/:projectId" element={<ProjectDetail />} />
                     <Route path="admin-dashboard/create-project" element={<AdminProjectCreation />} />
