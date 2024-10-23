@@ -33,12 +33,9 @@ const MapDashboard: React.FC = () => {
 
   const [iotDeviceList, setIoTDeviceList] = useState<any[]>([]); // Store the IoT device list
 
-  // Hardcoded rows, cols, and block values for dynamic grid
-  const numRows = 6; // Example number of rows
-  const numCols = 8; // Example number of columns
-  const blockValues = Array.from({ length: numRows }, (_, rowIndex) =>
-    Array.from({ length: numCols }, (_, colIndex) => `B${rowIndex * numCols + colIndex + 1} Yield- ${Math.floor(Math.random() * 30)}, Stress- ${Math.random() > 0.5 ? 'Yes' : 'No'}, Disease- ${Math.random() > 0.5 ? 'Yes' : 'No'}`)
-  );
+  const [tileData, setTileData] = useState<any[]>([]);
+  const [numRows, setNumRows] = useState(0);
+  const [numCols, setNumCols] = useState(0);
 
   // Fetch data from the API when the component mounts
   useEffect(() => {
@@ -74,18 +71,47 @@ const MapDashboard: React.FC = () => {
       }
     };
 
+    const fetchTileData = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/project/tiles/by/project/${id}`);
+        const tileData = await response.json();
+        
+        // Find the number of rows and columns dynamically
+        const maxRow = Math.max(...tileData.map((tile: any) => tile.row));
+        const maxCol = Math.max(...tileData.map((tile: any) => tile.col));
+        setNumRows(maxRow + 1);
+        setNumCols(maxCol + 1);
+
+        setTileData(tileData);
+      } catch (error) {
+        console.error('Error fetching tile data:', error);
+      }
+    };
+
     fetchData();
+    fetchTileData();
   }, [id]);
+
+  // Map the tile data to a 2D array for easier access
+  const blockValues = Array.from({ length: numRows }, (_, rowIndex) =>
+    Array.from({ length: numCols }, (_, colIndex) => {
+      const tile = tileData.find(
+        (t) => t.row === rowIndex && t.col === colIndex
+      );
+      return tile
+        ? `B${rowIndex * numCols + colIndex + 1} Yield- ${tile.yield}, Stress- ${tile.stress}, Disease- ${tile.disease}`
+        : `B${rowIndex * numCols + colIndex + 1} Yield- N/A, Stress- N/A, Disease- N/A`;
+    })
+  );
 
   // Dynamically set image path based on selected map type
   const getImagePath = () => {
     switch (mapType) {
       case 'ndvi':
-        return '../src/assets/maps/NDVI_map.png';
+        return '../../src/assets/maps/NDVI_map.png' ;
       case 'rendvi':
-        return '../src/assets/maps/RENDVI_map.png';
+        return '../../src/assets/maps/RENDVI_map.png';
       default:
-        // Use the API-fetched mapImageUrl if available, otherwise use a placeholder.
         return mapImageUrl || 'https://agrivis.blob.core.windows.net/agrivis/1729534754989.png?sv=2021-08-06&spr=https&se=2034-10-21T18%3A19%3A25Z&sr=b&sp=r&sig=kBSya5oiD3VFuifz2p0OsgADv4eudN%2BZAMziemrUgno%3D&rsct=text%2Fplain';
     }
   };
@@ -267,8 +293,8 @@ const MapDashboard: React.FC = () => {
                 block.style.zIndex = '0'; // Ensure grid blocks are behind markers
 
                 const blockValue = blockValues[i][j];
-                const isStress = blockValue.includes('Stress- Yes');
-                const isDisease = blockValue.includes('Disease- Yes');
+                const isStress = blockValue.includes('Stress- yes');
+                const isDisease = blockValue.includes('Disease- yes');
                 const yieldMatch = blockValue.match(/Yield- (\d+)/);
                 const yieldValue = yieldMatch ? parseInt(yieldMatch[1], 10) : 0;
 
@@ -306,6 +332,20 @@ const MapDashboard: React.FC = () => {
                   block.style.backgroundColor = isStressActive && isStress ? 'rgba(255, 0, 0, 0.2)' : isYieldActive ? getYieldColor(yieldValue) : 'transparent';
                   block.style.color = 'transparent'; // Hide text again
                   block.textContent = ''; // Clear the text content
+                };
+                block.onclick = () => {
+                  const centerLat = lowerLat + ((upperLat - lowerLat) * (i + 0.5)) / numRows;
+                  const centerLng = lowerLng + ((upperLng - lowerLng) * (j + 0.5)) / numCols;
+
+                  const infoWindow = new window.google.maps.InfoWindow({
+                    content: `<div>
+                      <h3>Tile Information</h3>
+                      <h3>${blockValue}</h3>
+                    </div>`,
+                    position: { lat: centerLat, lng: centerLng },
+                  });
+
+                  infoWindow.open(map);
                 };
 
                 this.div.appendChild(block);
