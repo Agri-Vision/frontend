@@ -12,6 +12,11 @@ import DiseaseMainDashboard from "../pages/DiseaseMainDashboard";
 import AgentDashboard from "../pages/AgentDashboard";
 import Example1 from "../pages/Example1";
 import ProjectDetail from "../compoenents/AgentDashboardPannels/ProjectDetail";
+import AdminProjectCreation from "../compoenents/AdminDashboardPanels/AdminProjectCreation";
+import AdminDashboard from "../pages/AdminDashboard";
+import CreateOrganization from "../compoenents/AdminDashboardPanels/CreateOrganization";
+import UploadMaps from "../compoenents/AgentDashboardPannels/UploadMaps";
+
 import { NotFoundPage } from "../pages/NotFound";
 import { Loading } from "../pages/Loading";
 
@@ -33,6 +38,14 @@ const IndexRoutes: React.FC = () => {
                     <Route path="example1" element={<Example1 />} />  
 
                     <Route path="customer-home" element={<CustomerHome />} />                  
+                    <Route path="agent-dashboard/project/:projectId" element={<ProjectDetail />} />
+                    <Route path="agent-dashboard/upload-map/:projectId" element={<UploadMaps />} />
+                    <Route path="admin-dashboard" element={<AdminDashboard />} />
+                    <Route path="admin-dashboard/project/:projectId" element={<ProjectDetail />} />
+                    <Route path="admin-dashboard/create-project" element={<AdminProjectCreation />} />
+                    <Route path="admin-dashboard/create-organization" element={<CreateOrganization />} />
+
+                    <Route path="example1" element={<Example1 />} />                    
                 </Route>
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/NotFoundPage" element={<NotFoundPage />} />
