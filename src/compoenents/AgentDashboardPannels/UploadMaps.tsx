@@ -13,7 +13,7 @@ interface Task {
 }
 
 const UploadMaps: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
+  const { id } = useParams<{ id: string }>();
   const [projectDetails, setProjectDetails] = useState<any>(null);
   const [mapFiles, setMapFiles] = useState<Record<string, File | null>>({
     rgbMap: null,
@@ -35,7 +35,7 @@ const UploadMaps: React.FC = () => {
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/project/${projectId}`);
+        const response = await axios.get(`http://localhost:8080/project/${id}`);
         setProjectDetails(response.data);
       } catch (error) {
         console.error('Error fetching project details:', error);
@@ -45,7 +45,7 @@ const UploadMaps: React.FC = () => {
     };
 
     fetchProjectDetails();
-  }, [projectId]);
+  }, [id]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, mapType: string) => {
     const file = event.target.files?.[0];
@@ -86,7 +86,7 @@ const UploadMaps: React.FC = () => {
     });
 
     try {
-      const response = await axios.put(`http://localhost:8080/project/maps/${projectId}`, formData);
+      const response = await axios.put(`http://localhost:8080/project/maps/${id}`, formData);
       console.log('Upload successful:', response.data);
       setMessage({ type: 'success', text: 'Maps uploaded successfully!' });
     } catch (error) {

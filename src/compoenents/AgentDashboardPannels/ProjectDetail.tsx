@@ -11,7 +11,7 @@ interface IoTDevice {
 }
 
 const ProjectDetail: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>(); // Retrieve the project ID from URL
+  const { id } = useParams<{ id: string }>(); // Retrieve the project ID from URL
   const [projectDetails, setProjectDetails] = useState<any>(null);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [iotDevices, setIoTDevices] = useState<IoTDevice[]>([{ id: '', currentLatitude: '', currentLongitude: '' }]);
@@ -23,8 +23,9 @@ const ProjectDetail: React.FC = () => {
   // Fetch project details from the backend
   useEffect(() => {
     const fetchProjectDetails = async () => {
+     
       try {
-        const response = await axios.get(`http://localhost:8080/project/${projectId}`);
+        const response = await axios.get(`http://localhost:8080/project/${id}`);
         setProjectDetails(response.data);
         setWebOdmProjectId(response.data.webOdmProjectId || '');
         setIoTDevices(response.data.iotDeviceList || []);
@@ -35,7 +36,7 @@ const ProjectDetail: React.FC = () => {
     };
 
     fetchProjectDetails();
-  }, [projectId]);
+  }, [id]);
 
   const categorizeImages = (images: File[]) => {
     const categorizedImages: { [key: string]: File[] } = {
@@ -122,14 +123,14 @@ const ProjectDetail: React.FC = () => {
 
     try {
       // Step 1: Obtain Authorization Token
-      const tokenResponse = await axios.post('http://localhost:8000/api/token-auth/', {
+      const tokenResponse = await axios.post('http://192.168.8.101:8000/api/token-auth/', {
         username: 'DinukaKariyawasam',
         password: 'test'
       });
       const token = tokenResponse.data.token;
 
       // Step 2: Create a New Project in WebODM
-      const projectResponse = await axios.post('http://localhost:8000/api/projects/', {
+      const projectResponse = await axios.post('http://192.168.8.101:8000/api/projects/', {
         name: projectDetails.projectName
       }, {
         headers: {
@@ -167,7 +168,7 @@ const ProjectDetail: React.FC = () => {
         formData.append('options', options);
 
         try {
-          const taskResponse = await axios.post(`http://localhost:8000/api/projects/${newWebOdmProjectId}/tasks/`, formData, {
+          const taskResponse = await axios.post(`http://192.168.8.101:8000/api/projects/${newWebOdmProjectId}/tasks/`, formData, {
             headers: {
               Authorization: `JWT ${token}`,
               'Content-Type': 'multipart/form-data'
@@ -217,7 +218,7 @@ const ProjectDetail: React.FC = () => {
   };
 
   try {
-    const response = await axios.put('http://localhost:8080/project', updateData);
+    const response = await axios.put('http://192.168.8.101:8080/project', updateData);
     console.log('Project updated:', response.data);
     setMessage({ type: 'success', text: 'Project updated successfully!' });
   } catch (error) {
