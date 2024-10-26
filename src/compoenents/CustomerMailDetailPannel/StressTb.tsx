@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 
 interface TileData {
   rowCol: string;
@@ -50,9 +50,10 @@ const StressTb: React.FC = () => {
         tiles.map(async (tile: any) => {
           const waterStress = await fetchWaterStress(tile.id);
           return {
-            id: tile.rowCol,
+            rowCol: tile.rowCol,
+            id: tile.id,
             stressStatus: tile.stress, // Stress status from the first API
-            waterStress: waterStress,  // Water stress from the second API
+            waterStress: waterStress, // Water stress from the second API
             actionForAverage: waterStress, // Assuming the action is based on water stress
           };
         })
@@ -75,16 +76,29 @@ const StressTb: React.FC = () => {
 
   // Define table columns
   const columns = [
-    { label: 'Block ID', key: 'id' },
+    { label: 'Block ID (Row_Column)', key: 'rowCol' },
     { label: 'Stress Status', key: 'stressStatus' },
     { label: 'Water Stress or Not', key: 'waterStress' },
     { label: 'Action for Average', key: 'actionForAverage' },
   ];
 
+  // Function to determine the row style based on stress status
+  const getRowStyle = (row: TileData) => {
+    return row.stressStatus === 'yes'
+      ? { backgroundColor: 'rgba(255, 0, 0, 0.2)' }
+      : {};
+  };
+
   return (
     <div className="history-table-container">
       <h2>Stress Analysis</h2>
-      <ReusableTable columns={columns} data={data} onRowClick={handleRowClick} recordsPerPage={5} />
+      <ReusableTable 
+        columns={columns} 
+        data={data} 
+        onRowClick={handleRowClick} 
+        recordsPerPage={5} 
+        getRowStyle={getRowStyle} 
+      />
 
       {/* MUI Modal for showing Tile data details */}
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{

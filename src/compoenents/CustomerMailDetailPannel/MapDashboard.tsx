@@ -45,7 +45,7 @@ const MapDashboard: React.FC = () => {
         const data = await response.json();
         const mapImagePngUrl = data?.taskList?.[0]?.mapImagePngUrl;
 
-        console.log('map API'+mapImagePngUrl)
+        console.log('map API - '+mapImagePngUrl)
 
         const upperLat = parseFloat(data?.taskList?.[0]?.upperLat);
         const lowerLat = parseFloat(data?.taskList?.[0]?.lowerLat);

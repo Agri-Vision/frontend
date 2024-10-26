@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography } from '@mui/material';
-import { strict } from 'assert';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
 
 interface IoTData {
   rowCol: string;
@@ -24,16 +23,19 @@ const DiseaseTb: React.FC = () => {
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (tileId: number) => `${API_BASE_URL}/prediction/disease/health-score/${tileId}`;
 
-  // Convert time to 12-hour format
   const convertTo12HourFormat = (time: string) => {
     const [hours, minutes, seconds] = time.split(':');
     let hour = parseInt(hours);
     const amPm = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12; // Convert to 12-hour format, making '0' hours as '12'
+    hour = hour % 12 || 12;
     return `${hour}:${minutes}:${seconds} ${amPm}`;
   };
 
-  // Fetch disease vulnerability for a tile
+  const extractPercentage = (result: string) => {
+    const match = result.match(/(\d+(\.\d+)?)%/);
+    return match ? parseFloat(match[1]) : null;
+  };
+
   const fetchDiseaseVulnerability = async (tileId: number) => {
     try {
       const response = await fetch(PREDICTION_API_URL(tileId));
@@ -41,14 +43,13 @@ const DiseaseTb: React.FC = () => {
         throw new Error(`Failed to fetch disease vulnerability for tile ID: ${tileId}`);
       }
       const result = await response.json();
-      return result.result || 'Unknown'; // Default value if the result is not present
+      return result.result || 'Unknown';
     } catch (error) {
       console.error('Error fetching disease vulnerability:', error);
       return 'Unknown';
     }
   };
 
-  // Fetch tile data and merge with disease vulnerability
   const fetchTileData = async () => {
     try {
       const tileResponse = await fetch(TILE_API_URL);
@@ -57,17 +58,17 @@ const DiseaseTb: React.FC = () => {
       }
       const tiles = await tileResponse.json();
 
-      // Fetch disease vulnerability for each tile
       const transformedData: IoTData[] = await Promise.all(
         tiles.map(async (tile: any) => {
           const diseaseVulnerability = await fetchDiseaseVulnerability(tile.id);
           return {
-            id: tile.rowCol,
+            rowCol: tile.rowCol,
+            id: tile.id,
             recordedDateTime: `${tile.createdDate}, ${convertTo12HourFormat(tile.createdDate.split(' ')[1])}`,
             temperature: tile.temperature,
             humidity: tile.humidity,
             uvLevel: tile.uvLevel,
-            diseaseVulnerability: diseaseVulnerability, // From second API
+            diseaseVulnerability: diseaseVulnerability,
           };
         })
       );
@@ -88,9 +89,8 @@ const DiseaseTb: React.FC = () => {
     setShowModal(true);
   };
 
-  // Define table columns
   const columns = [
-    { label: 'Block ID', key: 'id' },
+    { label: 'Block ID', key: 'rowCol' },
     { label: 'Temperature', key: 'temperature' },
     { label: 'Humidity', key: 'humidity' },
     { label: 'UV Level', key: 'uvLevel' },
@@ -98,11 +98,30 @@ const DiseaseTb: React.FC = () => {
   ];
 
   return (
-    <div className="history-table-container">
-      <h2>Disease Analysis</h2>
+    <div className="history-table-container" style={{ marginTop: '30px' }}>
+      <Typography variant="h4" mb={2}>Disease Analysis</Typography>
+
+      <Box display="flex" alignItems="center" mb={2}>
+        <Box display="flex" alignItems="center" mr={2}>
+          <Box width={10} height={10} borderRadius="50%" bgcolor="rgba(0, 128, 0, 0.7)" mr={1} />
+          <Typography variant="body2">Low Vulnerability to Diseases</Typography>
+        </Box>
+        <Box display="flex" alignItems="center" mr={2}>
+          <Box width={10} height={10} borderRadius="50%" bgcolor="rgba(255, 255, 0, 0.7)" mr={1} />
+          <Typography variant="body2">Moderate Vulnerability to Diseases</Typography>
+        </Box>
+        <Box display="flex" alignItems="center" mr={2}>
+          <Box width={10} height={10} borderRadius="50%" bgcolor="rgba(255, 165, 0, 0.7)" mr={1} />
+          <Typography variant="body2">Vulnerable to Diseases</Typography>
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Box width={10} height={10} borderRadius="50%" bgcolor="rgba(255, 0, 0, 0.7)" mr={1} />
+          <Typography variant="body2">High Vulnerability to Diseases</Typography>
+        </Box>
+      </Box>
+
       <ReusableTable columns={columns} data={data} onRowClick={handleRowClick} recordsPerPage={5} />
 
-      {/* MUI Modal for showing IoT data details */}
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{
         style: {
           borderRadius: 20, 
