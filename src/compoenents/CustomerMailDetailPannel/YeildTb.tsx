@@ -63,8 +63,8 @@ const YeildTb: React.FC = () => {
 
   // Define table columns
   const columns = [
-    { label: 'Tile ID', key: 'id' },
-    { label: 'Yield Estimation', key: 'yieldEstimation' },
+    { label: 'Block ID (Row_Column)', key: 'id' },
+    { label: 'Yield Estimation (Kg)', key: 'yieldEstimation' },
     { label: 'Possible Condition', key: 'conditionStatus' },
   ];
 
@@ -83,7 +83,7 @@ const YeildTb: React.FC = () => {
         <DialogContent style={{ backgroundColor: '#F1F8E9' }}>
           {selectedData ? (
             <>
-              <Typography variant="h6" color="textPrimary"><strong>Tile ID:</strong> {selectedData.rowCol}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Block ID (Row_Column):</strong> {selectedData.rowCol}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Yield Estimation:</strong> {selectedData.yieldEstimation} Kg</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Possible Condition:</strong> {selectedData.conditionStatus}</Typography>
             </>

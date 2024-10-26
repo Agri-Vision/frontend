@@ -10,7 +10,7 @@ interface IoTData {
   temperature: string;
   humidity: string;
   uvLevel: string;
-  diseaseVulnerability: string; // To store disease vulnerability from second API
+  diseaseVulnerability: string;
 }
 
 const DiseaseTb: React.FC = () => {
@@ -33,7 +33,7 @@ const DiseaseTb: React.FC = () => {
 
   const extractPercentage = (result: string) => {
     const match = result.match(/(\d+(\.\d+)?)%/);
-    return match ? parseFloat(match[1]) : null;
+    return match ? `${parseFloat(match[1])}%` : 'Unknown';
   };
 
   const fetchDiseaseVulnerability = async (tileId: number) => {
@@ -43,7 +43,7 @@ const DiseaseTb: React.FC = () => {
         throw new Error(`Failed to fetch disease vulnerability for tile ID: ${tileId}`);
       }
       const result = await response.json();
-      return result.result || 'Unknown';
+      return extractPercentage(result.result || 'Unknown');
     } catch (error) {
       console.error('Error fetching disease vulnerability:', error);
       return 'Unknown';
@@ -68,7 +68,7 @@ const DiseaseTb: React.FC = () => {
             temperature: tile.temperature,
             humidity: tile.humidity,
             uvLevel: tile.uvLevel,
-            diseaseVulnerability: diseaseVulnerability,
+            diseaseVulnerability: diseaseVulnerability, // Only percentage
           };
         })
       );
@@ -90,9 +90,9 @@ const DiseaseTb: React.FC = () => {
   };
 
   const columns = [
-    { label: 'Block ID', key: 'rowCol' },
-    { label: 'Temperature', key: 'temperature' },
-    { label: 'Humidity', key: 'humidity' },
+    { label: 'Block ID (Row_Column)', key: 'rowCol' },
+    { label: 'Temperature (℃)', key: 'temperature' },
+    { label: 'Humidity (%)', key: 'humidity' },
     { label: 'UV Level', key: 'uvLevel' },
     { label: 'Disease Vulnerability', key: 'diseaseVulnerability' },
   ];
@@ -131,7 +131,7 @@ const DiseaseTb: React.FC = () => {
         <DialogContent style={{ backgroundColor: '#F1F8E9' }}>
           {selectedData ? (
             <>
-              <Typography variant="h6" color="textPrimary"><strong>Block ID:</strong> {selectedData.rowCol}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Block ID (Row_Column):</strong> {selectedData.rowCol}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} °C</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
               <Typography variant="h6" color="textPrimary"><strong>UV Level:</strong> {selectedData.uvLevel}</Typography>
