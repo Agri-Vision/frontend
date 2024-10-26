@@ -6,19 +6,13 @@ import MapIcon from '@mui/icons-material/Map';
 import SpaIcon from '@mui/icons-material/Spa';
 import PodcastsIcon from '@mui/icons-material/Podcasts';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import { useParams } from 'react-router-dom';
 import GrassIcon from '@mui/icons-material/Grass';
 import CoronavirusIcon from '@mui/icons-material/Coronavirus';
-
-interface Metric {
-    title: string;
-    value: string;
-    change: string;
-    positive: boolean;
-    icon: React.ReactNode;
-}
+import { useParams } from 'react-router-dom';
+import { useButtonContext } from '../ButtonContext'; // Import the ButtonContext
 
 const Statistics: React.FC = () => {
+    const { isYieldActive, isStressActive, isDiseaseActive } = useButtonContext(); // Get the states from context
     const { id } = useParams<{ id: string }>();
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const [metrics, setMetrics] = useState({
@@ -26,6 +20,8 @@ const Statistics: React.FC = () => {
         estimatedYield: { value: '0', change: '1.3% Up from last Project', positive: true },
         IOTDevices: { value: '0', change: '0 Device', positive: true },
         validPeriod: { value: '0', change: 'Days Remaining', positive: false },
+        estimatedStress: { value: '0', change: 'Compaired to last Record', positive: true },
+        estimatedDisease: { value: '0', change: 'Compaired to last Record', positive: true },
     });
 
     useEffect(() => {
@@ -48,6 +44,15 @@ const Statistics: React.FC = () => {
                 const yieldData = await yieldResponse.json();
                 const estimatedYield = yieldData.result;
 
+                // Fetch disease and stress values from their respective APIs
+                const diseaseResponse = await fetch(`${API_BASE_URL}/project/total/disease-pct/${id}`);
+                const diseaseData = await diseaseResponse.json();
+                const diseaseValue = diseaseData.result;
+
+                const stressResponse = await fetch(`${API_BASE_URL}/project/total/stress-pct/${id}`);
+                const stressData = await stressResponse.json();
+                const stressValue = stressData.result;
+
                 // Update metrics with API data
                 setMetrics({
                     coveredArea: { value: '1,689', change: '8.5% Up from last Project', positive: true }, // Example value
@@ -65,6 +70,16 @@ const Statistics: React.FC = () => {
                         value: `${diffTime > 0 ? diffTime : 0}`, 
                         change: 'Days Remaining', 
                         positive: diffTime > 28
+                    },
+                    estimatedStress: { 
+                        value: `${stressValue}%`, 
+                        change: 'Compaired to last Record', 
+                        positive: stressValue < 50 
+                    },
+                    estimatedDisease: { 
+                        value: `${diseaseValue}%`, 
+                        change: 'Compaired to last Record', 
+                        positive: diseaseValue < 50 
                     },
                 });
             } catch (error) {
@@ -139,6 +154,7 @@ const Statistics: React.FC = () => {
                 </Grid>
 
                 {/* Valid Period Card */}
+                {!isDiseaseActive && !isStressActive &&  (
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
                         <Avatar sx={{ bgcolor: metrics.validPeriod.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
@@ -157,50 +173,51 @@ const Statistics: React.FC = () => {
                         </Box>
                     </Paper>
                 </Grid>
-
+                )}
 
                 {/* Stress Estimation Card */}
+                {isStressActive && !isDiseaseActive && !isYieldActive && (
                 <Grid item xs={12} sm={6} md={3}>
-                                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
-                                        <Avatar sx={{ bgcolor: metrics.validPeriod.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
-                                            <GrassIcon />
-                                        </Avatar>
-                                        <Box sx={{ textAlign: 'center', flex: 1 }}>
-                                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
-                                                {metrics.validPeriod.value}
-                                            </Typography>
-                                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
-                                                Estimated Stress
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: metrics.validPeriod.positive ? 'green' : 'red', marginTop: 1 }}>
-                                                {metrics.validPeriod.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.validPeriod.change}
-                                            </Typography>
-                                        </Box>
-                                    </Paper>
-                                </Grid>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
+                        <Avatar sx={{ bgcolor: metrics.estimatedStress.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
+                            <GrassIcon />
+                        </Avatar>
+                        <Box sx={{ textAlign: 'center', flex: 1 }}>
+                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
+                                {metrics.estimatedStress.value}
+                            </Typography>
+                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
+                                Estimated Stress (%)
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: metrics.estimatedStress.positive ? 'green' : 'red', marginTop: 1 }}>
+                                {metrics.estimatedStress.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.estimatedStress.change}
+                            </Typography>
+                        </Box>
+                    </Paper>
+                </Grid>
+                )}
 
-                                
                 {/* Disease Estimation Card */}
+                {isDiseaseActive && !isStressActive && !isYieldActive && (
                 <Grid item xs={12} sm={6} md={3}>
-                                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
-                                        <Avatar sx={{ bgcolor: metrics.validPeriod.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
-                                            <CoronavirusIcon />
-                                        </Avatar>
-                                        <Box sx={{ textAlign: 'center', flex: 1 }}>
-                                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
-                                                {metrics.validPeriod.value}
-                                            </Typography>
-                                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
-                                                Estimated Disease
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: metrics.validPeriod.positive ? 'green' : 'red', marginTop: 1 }}>
-                                                {metrics.validPeriod.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.validPeriod.change}
-                                            </Typography>
-                                        </Box>
-                                    </Paper>
-                                </Grid>
-
-
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
+                        <Avatar sx={{ bgcolor: metrics.estimatedDisease.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
+                            <CoronavirusIcon />
+                        </Avatar>
+                        <Box sx={{ textAlign: 'center', flex: 1 }}>
+                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
+                                {metrics.estimatedDisease.value}
+                            </Typography>
+                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
+                                Estimated Disease (%)
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: metrics.estimatedDisease.positive ? 'green' : 'red', marginTop: 1 }}>
+                                {metrics.estimatedDisease.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.estimatedDisease.change}
+                            </Typography>
+                        </Box>
+                    </Paper>
+                </Grid>
+                )}
             </Grid>
         </Box>
     );
