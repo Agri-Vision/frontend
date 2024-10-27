@@ -42,22 +42,7 @@ const SideNavBar: FunctionComponent<
       label: "Disease Dashboard",
       link: "/home/disease-dashboard",
     },
-    // {
-    //   icon: <DraftsOutlinedIcon />,
-    //   label: "Example6",
-    //   subItems: [
-    //     {
-    //       icon: <StarBorderOutlinedIcon />,
-    //       label: "SubExample1",
-    //       link: "/home/example1",
-    //     },
-    //     {
-    //       icon: <DeleteOutlinedIcon />,
-    //       label: "SubExample2",
-    //       link: "/home/subexample2",
-    //     },
-    //   ],
-    // },
+
   ];
 
   return (

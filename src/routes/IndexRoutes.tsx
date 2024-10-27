@@ -30,6 +30,7 @@ const IndexRoutes: React.FC = () => {
                     <Route path="disease-dashboard" element={<DiseaseMainDashboard />} />
                     <Route path="agent-dashboard" element={<AgentDashboard />} />
                     <Route path="agent-dashboard/project/:id" element={<ProjectDetail />} />
+                    
                     <Route path="example1" element={<Example1 />} />  
 
                     <Route path="customer-home" element={<CustomerHome />} />                  
