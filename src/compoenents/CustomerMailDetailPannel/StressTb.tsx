@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
+import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface TileData {
   rowCol: string;
@@ -21,6 +22,7 @@ const StressTb: React.FC = () => {
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (tileId: number) => `${API_BASE_URL}/prediction/stress/${tileId}`;
 
+  const { highlightBlock } = useMapHighlightContext(); // Access the highlight function from context
   
   // Fetch Water Stress information using tile ID
   const fetchWaterStress = async (tileId: number) => {
@@ -95,10 +97,17 @@ const fetchTileData = async () => {
     fetchTileData();
   }, []);
 
-  const handleRowClick = (rowData: TileData) => {
+  const handleLocateClick = (rowData: TileData) => {
+    console.log("Locate button clicked for Block ID StressTB:", rowData.rowCol);
+    highlightBlock(rowData.rowCol); // Highlight the block on the map
+  };
+
+
+  const handleViewClick = (rowData: TileData) => {
     setSelectedData(rowData);
     setShowModal(true);
   };
+
 
   // Define table columns
   const columns = [
@@ -106,6 +115,30 @@ const fetchTileData = async () => {
     { label: 'Stress Status', key: 'stressStatus' },
     { label: 'Water Stress or Not', key: 'waterStress' },
     { label: 'Action for Average', key: 'actionForAverage' },
+    {
+      label: 'Locate',
+      key: 'locate',
+      render: (rowData: TileData) => (
+        <Button onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering row click
+          handleLocateClick(rowData);
+        }} variant="contained" color="primary">
+          Locate
+        </Button>
+      )
+    },
+    {
+      label: 'View',
+      key: 'view',
+      render: (rowData: TileData) => (
+        <Button onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering row click
+          handleViewClick(rowData);
+        }} variant="contained" color="secondary">
+          View
+        </Button>
+      )
+    }
   ];
 
   return (
@@ -131,7 +164,7 @@ const fetchTileData = async () => {
       <ReusableTable 
         columns={columns} 
         data={data} 
-        onRowClick={handleRowClick} 
+        onRowClick={handleViewClick} 
         recordsPerPage={5} 
       />
 

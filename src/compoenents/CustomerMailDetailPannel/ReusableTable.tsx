@@ -16,6 +16,7 @@ import {
 interface Column {
   label: string;
   key: string;
+  render?: (rowData: any) => JSX.Element;
 }
 
 interface TableProps {
@@ -87,51 +88,33 @@ const ReusableTable: React.FC<TableProps> = ({ columns, data, recordsPerPage = 5
                   {column.label}
                 </TableCell>
               ))}
-              <TableCell
-                sx={{
-                  fontWeight: 'bold',
-                  backgroundColor: '#f5f5f5',
-                  color: '#333',
-                  textTransform: 'uppercase',
-                }}
-              >
-                View
-              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {currentData.map((row, rowIndex) => (
-              <TableRow
-                key={rowIndex}
-                onClick={() => onRowClick && onRowClick(row)}
-              >
+              <TableRow key={rowIndex} onClick={() => onRowClick && onRowClick(row)}>
                 {columns.map((column, colIndex) => (
                   <TableCell key={colIndex}>
-                    {(column.key === 'diseaseVulnerability' || column.key === 'stressStatus' || column.key === 'waterStress') ? (
-                      <Box
-                        sx={{
-                          display: 'inline-block',
-                          padding: '4px 8px',
-                          backgroundColor: getBoxColor(column.key, row[column.key]),
-                          borderRadius: '8px',
-                        }}
-                      >
-                        <Typography variant="body2">{row[column.key]}</Typography>
-                      </Box>
+                    {column.render ? (
+                      column.render(row) // Use custom render function if defined
                     ) : (
-                      row[column.key]
+                      (column.key === 'diseaseVulnerability' || column.key === 'stressStatus' || column.key === 'waterStress') ? (
+                        <Box
+                          sx={{
+                            display: 'inline-block',
+                            padding: '4px 8px',
+                            backgroundColor: getBoxColor(column.key, row[column.key]),
+                            borderRadius: '8px',
+                          }}
+                        >
+                          <Typography variant="body2">{row[column.key]}</Typography>
+                        </Box>
+                      ) : (
+                        row[column.key]
+                      )
                     )}
                   </TableCell>
                 ))}
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => onRowClick && onRowClick(row)}
-                  >
-                    View
-                  </Button>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
