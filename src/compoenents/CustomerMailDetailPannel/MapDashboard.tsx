@@ -338,7 +338,7 @@ const MapDashboard: React.FC = () => {
 
                 // Add hover effects for background color and text
                 block.onmouseover = () => {
-                  if (!isStressActive || !isStress) {
+                  if (!isStressActive || !isDiseaseActive) {
                     block.style.backgroundColor = 'rgba(222, 242, 211, 0.4)'; // Highlight color on hover
                   }
                   block.style.color = 'white'; // Show text on hover
@@ -347,11 +347,19 @@ const MapDashboard: React.FC = () => {
 
                 
                 block.onmouseout = () => {
-                  block.style.backgroundColor = isStressActive && isStress ? 'rgba(255, 0, 0, 0.2)' : isYieldActive ? getYieldColor(yieldValue) : 'transparent';
+                  // Maintain original color depending on the active state
+                  if (isStressActive && isStress) {
+                    block.style.backgroundColor = 'rgba(255, 0, 0, 0.2)'; // Keep stress red
+                  } else if (isDiseaseActive && isDisease) {
+                    block.style.backgroundColor = 'rgba(105, 0, 0, 0.4)'; // Keep disease light brown
+                  } else if (isYieldActive) {
+                    block.style.backgroundColor = getYieldColor(yieldValue); // Keep yield color
+                  } else {
+                    block.style.backgroundColor = 'transparent'; // Default transparent
+                  }
                   block.style.color = 'transparent'; // Hide text again
                   block.textContent = ''; // Clear the text content
                 };
-
         
 
                 block.onclick = () => {
