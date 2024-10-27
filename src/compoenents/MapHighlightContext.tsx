@@ -12,7 +12,6 @@ export const MapHighlightProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [highlightedBlock, setHighlightedBlock] = useState<string | null>(null);
 
   const highlightBlock = (blockId: string) => {
-    console.log("Setting highlighted block ID to mapcontext:", blockId);
     setHighlightedBlock(blockId);
   };
 

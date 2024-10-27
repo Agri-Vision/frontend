@@ -22,13 +22,11 @@ const MapDashboard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { highlightedBlock } = useMapHighlightContext(); // Access the highlighted block
 
-  console.log("Current highlighted block on the map mapdashboard :", highlightedBlock);
-
   const { isStressActive, isDiseaseActive, isYieldActive } = useButtonContext(); // Access stress, yield, and disease state from context
   const { iotEnabled } = useIoTContext(); // Access IoT marker toggle state
   const { mapType } = useMapTypeContext(); // Access map type from context
-  const [infoWindow, setInfoWindow] = useState<google.maps.InfoWindow | null>(null);
 
+  
   const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
   const [geoCoordinates, setGeoCoordinates] = useState<{
     upperLat: number;
@@ -38,7 +36,7 @@ const MapDashboard: React.FC = () => {
   } | null>(null);
 
   const [iotDeviceList, setIoTDeviceList] = useState<any[]>([]); // Store the IoT device list
-
+  const [activeInfoWindow, setActiveInfoWindow] = useState<google.maps.InfoWindow | null>(null);
   const [tileData, setTileData] = useState<any[]>([]);
   const [numRows, setNumRows] = useState(0);
   const [numCols, setNumCols] = useState(0);
@@ -357,22 +355,27 @@ const MapDashboard: React.FC = () => {
         
 
                 block.onclick = () => {
-                  const centerLat = lowerLat + ((upperLat - lowerLat) * (i )) / numRows;
-                  const centerLng = lowerLng + ((upperLng - lowerLng) * (j )) / numCols;
+                  const blockLat = upperLat - (i + 0.5) * (upperLat - lowerLat) / numRows;
+                  const blockLng = lowerLng + (j + 0.5) * (upperLng - lowerLng) / numCols;
 
-                  const infoWindow = new window.google.maps.InfoWindow({
+                  // Close the previously active InfoWindow
+                  if (activeInfoWindow) {
+                    activeInfoWindow.close();
+                  }
+
+                  const newInfoWindow = new window.google.maps.InfoWindow({
                     content: `<div>
                       <h3>Tile Information</h3>
-                      <h3>${blockValue}</h3>
+                      <p>${blockValue}</p>
                     </div>`,
-                    position: { lat: centerLat, lng: centerLng },
+                    position: { lat: blockLat, lng: blockLng },
                   });
 
-                  infoWindow.open(map);
+                  newInfoWindow.open(map);
+                  setActiveInfoWindow(newInfoWindow);
                 };
 
-                
-
+              
                 this.div.appendChild(block);
               }
             }

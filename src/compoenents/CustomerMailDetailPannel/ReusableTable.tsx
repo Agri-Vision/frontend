@@ -63,7 +63,7 @@ const ReusableTable: React.FC<TableProps> = ({ columns, data, recordsPerPage = 5
     }
     
     if (columnKey === 'waterStress') {
-      return value === 'Possible Water Stress Detected' ? 'rgba(0, 0, 255, 0.2)' : 'rgba(128, 128, 128, 0.2)'; // Blue if detected, gray otherwise
+      return value === 'Possible Water Stress Detected.' ? 'rgba(0, 0, 255, 0.2)' : 'rgba(128, 128, 128, 0.2)'; // Blue if detected, gray otherwise
     }
 
     return 'transparent';
