@@ -22,8 +22,18 @@ const StressTb: React.FC = () => {
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (tileId: number) => `${API_BASE_URL}/prediction/stress/${tileId}`;
 
-  const { highlightBlock } = useMapHighlightContext(); // Access the highlight function from context
+  const { highlightedBlock, highlightBlock, removeHighlight } = useMapHighlightContext(); // Access the highlight function from context
   
+  const handleLocateClick = (rowData: TileData) => {
+    if (highlightedBlock === rowData.rowCol) {
+      console.log("Unlocating Block ID:", rowData.rowCol);
+      removeHighlight();
+    } else {
+      console.log("Locating Block ID:", rowData.rowCol);
+      highlightBlock(rowData.rowCol);
+    }
+  };
+
   // Fetch Water Stress information using tile ID
   const fetchWaterStress = async (tileId: number) => {
     try {
@@ -97,10 +107,7 @@ const fetchTileData = async () => {
     fetchTileData();
   }, []);
 
-  const handleLocateClick = (rowData: TileData) => {
-    console.log("Locate button clicked for Block ID StressTB:", rowData.rowCol);
-    highlightBlock(rowData.rowCol); // Highlight the block on the map
-  };
+  
 
 
   const handleViewClick = (rowData: TileData) => {
@@ -119,11 +126,26 @@ const fetchTileData = async () => {
       label: 'Locate',
       key: 'locate',
       render: (rowData: TileData) => (
-        <Button onClick={(e) => {
-          e.stopPropagation(); // Prevent triggering row click
-          handleLocateClick(rowData);
-        }} variant="contained" color="primary">
-          Locate
+        <Button 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering row click
+            handleLocateClick(rowData);
+          }} 
+          variant="contained" 
+          color={highlightedBlock === rowData.rowCol ? "error" : "primary"}
+          sx={{
+            backgroundColor: highlightedBlock === rowData.rowCol ? 'rgba(6,26,41,255)' : undefined,
+            '&:hover': {
+              backgroundColor: highlightedBlock === rowData.rowCol ? 'primary' : undefined,
+            },
+            fontFamily: 'Nunito, Poppins, sans-serif',
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            minWidth: '90px',
+            height: '32px'
+          }}
+        >
+          {highlightedBlock === rowData.rowCol ? 'Unlocate' : 'Locate'}
         </Button>
       )
     },
@@ -134,7 +156,15 @@ const fetchTileData = async () => {
         <Button onClick={(e) => {
           e.stopPropagation(); // Prevent triggering row click
           handleViewClick(rowData);
-        }} variant="contained" color="secondary">
+        }} 
+        sx={{
+          fontFamily: 'Nunito, Poppins, sans-serif',
+          padding: '4px 8px',
+          fontSize: '0.85rem',
+          minWidth: '80px',
+          height: '32px'
+        }}
+        variant="contained" color="primary">
           View
         </Button>
       )
