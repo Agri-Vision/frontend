@@ -92,14 +92,14 @@ export const DeafultHeader: FunctionComponent = (): ReactElement => {
             position: 'absolute',
             top: 0,
             left: 0,
-            padding: '10px', // Add padding to ensure the logo is not stuck to the edge
+            paddingLeft: '12px', // Add padding to ensure the logo is not stuck to the edge
             display: 'flex',
             alignItems: 'center',
             height: '100%' // Ensure it stays aligned vertically in the toolbar
         }}
     >
         <img
-            src="../src/assets/img/webLogo.png"
+            src="\src\assets\img\webLogo.png"
             alt="Web Logo"
             style={{
                 height: '50px', 

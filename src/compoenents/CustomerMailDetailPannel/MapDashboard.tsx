@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useButtonContext } from '../ButtonContext'; // For Stress, Yield, and Disease toggle context
 import { useIoTContext } from '../IoTContext'; // For IoT toggle context
 import { useMapTypeContext } from '../MapTypeContext'; // For MapTypeContext
+import { useMapHighlightContext } from '../MapHighlightContext';
+
 
 declare global {
   interface Window {
@@ -18,11 +20,13 @@ const MapDashboard: React.FC = () => {
   const markerRefs = useRef<any[]>([]);  // Store references to IoT markers
   const overlayRef = useRef<any>(null);
   const { id } = useParams<{ id: string }>();
+  const { highlightedBlock } = useMapHighlightContext(); // Access the highlighted block
 
   const { isStressActive, isDiseaseActive, isYieldActive } = useButtonContext(); // Access stress, yield, and disease state from context
   const { iotEnabled } = useIoTContext(); // Access IoT marker toggle state
   const { mapType } = useMapTypeContext(); // Access map type from context
 
+  
   const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
   const [geoCoordinates, setGeoCoordinates] = useState<{
     upperLat: number;
@@ -32,7 +36,7 @@ const MapDashboard: React.FC = () => {
   } | null>(null);
 
   const [iotDeviceList, setIoTDeviceList] = useState<any[]>([]); // Store the IoT device list
-
+  const [activeInfoWindow, setActiveInfoWindow] = useState<google.maps.InfoWindow | null>(null);
   const [tileData, setTileData] = useState<any[]>([]);
   const [numRows, setNumRows] = useState(0);
   const [numCols, setNumCols] = useState(0);
@@ -46,7 +50,7 @@ const MapDashboard: React.FC = () => {
         const data = await response.json();
         const mapImagePngUrl = data?.taskList?.[0]?.mapImagePngUrl;
 
-        console.log('map API - '+mapImagePngUrl)
+        // console.log('map API - '+mapImagePngUrl)
 
         const upperLat = parseFloat(data?.taskList?.[0]?.upperLat);
         const lowerLat = parseFloat(data?.taskList?.[0]?.lowerLat);
@@ -299,6 +303,16 @@ const MapDashboard: React.FC = () => {
                 const yieldMatch = blockValue.match(/Yield- (\d+)/);
                 const yieldValue = yieldMatch ? parseInt(yieldMatch[1], 10) : 0;
 
+                const blockId = `B${i * numCols + j + 1}`;
+
+            // Highlight the block if it matches the highlightedBlock
+            if (highlightedBlock === blockId) {
+              block.style.backgroundColor = 'rgba(255, 255, 0, 0.5)'; // Yellow highlight
+              block.style.border = '2px solid yellow';
+            }
+
+        
+
                 // If stress is active and the block contains "Stress- Yes", set the background to red
                 if (isStressActive && isStress) {
                   block.style.backgroundColor = 'rgba(255, 0, 0, 0.2)'; // Highlight red for stress
@@ -314,6 +328,8 @@ const MapDashboard: React.FC = () => {
                   block.style.backgroundColor = getYieldColor(yieldValue);
                 }
 
+
+                      
                 block.style.display = 'flex';
                 block.style.alignItems = 'center';
                 block.style.justifyContent = 'center';
@@ -329,26 +345,37 @@ const MapDashboard: React.FC = () => {
                   block.textContent = blockValue; // Show the corresponding value from the array
                 };
 
+                
                 block.onmouseout = () => {
                   block.style.backgroundColor = isStressActive && isStress ? 'rgba(255, 0, 0, 0.2)' : isYieldActive ? getYieldColor(yieldValue) : 'transparent';
                   block.style.color = 'transparent'; // Hide text again
                   block.textContent = ''; // Clear the text content
                 };
-                block.onclick = () => {
-                  const centerLat = lowerLat + ((upperLat - lowerLat) * (i )) / numRows;
-                  const centerLng = lowerLng + ((upperLng - lowerLng) * (j )) / numCols;
 
-                  const infoWindow = new window.google.maps.InfoWindow({
+        
+
+                block.onclick = () => {
+                  const blockLat = upperLat - (i + 0.5) * (upperLat - lowerLat) / numRows;
+                  const blockLng = lowerLng + (j + 0.5) * (upperLng - lowerLng) / numCols;
+
+                  // Close the previously active InfoWindow
+                  if (activeInfoWindow) {
+                    activeInfoWindow.close();
+                  }
+
+                  const newInfoWindow = new window.google.maps.InfoWindow({
                     content: `<div>
                       <h3>Tile Information</h3>
-                      <h3>${blockValue}</h3>
+                      <p>${blockValue}</p>
                     </div>`,
-                    position: { lat: centerLat, lng: centerLng },
+                    position: { lat: blockLat, lng: blockLng },
                   });
 
-                  infoWindow.open(map);
+                  newInfoWindow.open(map);
+                  setActiveInfoWindow(newInfoWindow);
                 };
 
+              
                 this.div.appendChild(block);
               }
             }
@@ -384,7 +411,7 @@ const MapDashboard: React.FC = () => {
     } else {
       initMap();
     }
-  }, [isStressActive, isDiseaseActive, isYieldActive, iotEnabled, iotDeviceList, mapType, mapImageUrl, geoCoordinates]); // Re-run when any of the states change
+  }, [isStressActive, isDiseaseActive, isYieldActive, iotEnabled, iotDeviceList, mapType, mapImageUrl, geoCoordinates, highlightedBlock]); // Re-run when any of the states change
 
   // Update IoT marker visibility when iotEnabled changes
   useEffect(() => {

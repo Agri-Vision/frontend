@@ -68,7 +68,7 @@ const Statistics: React.FC = () => {
                                 {metrics.coveredArea.value}
                             </Typography>
                             <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
-                                Total Estates
+                                Total Projects
                             </Typography>
                         </Box>
                     </Paper>
@@ -85,7 +85,7 @@ const Statistics: React.FC = () => {
                                 {metrics.estimatedYield.value}
                             </Typography>
                             <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
-                                New Estates
+                                New Projects
                             </Typography>
                         </Box>
                     </Paper>
@@ -102,7 +102,7 @@ const Statistics: React.FC = () => {
                                 {metrics.IOTDevices.value}
                             </Typography>
                             <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
-                                Pending Estates
+                                Pending Projects
                             </Typography>
                         </Box>
                     </Paper>
@@ -119,7 +119,7 @@ const Statistics: React.FC = () => {
                                 {metrics.validPeriod.value}
                             </Typography>
                             <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
-                                Completed Estates
+                                Completed Projects
                             </Typography>
                         </Box>
                     </Paper>
