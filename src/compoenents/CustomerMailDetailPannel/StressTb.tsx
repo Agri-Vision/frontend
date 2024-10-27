@@ -50,34 +50,46 @@ const StressTb: React.FC = () => {
     }
   };
 
-  // Fetch the tile data and merge it with water stress info
-  const fetchTileData = async () => {
-    try {
-      const tileResponse = await fetch(TILE_API_URL);
-      if (!tileResponse.ok) {
-        throw new Error('Failed to fetch tile data');
-      }
-      const tiles = await tileResponse.json();
-
-      // Transform the tile data and fetch water stress for each tile
-      const transformedData: TileData[] = await Promise.all(
-        tiles.map(async (tile: any) => {
-          const { waterStress, actionForAverage } = await fetchWaterStress(tile.id);
-          return {
-            rowCol: tile.rowCol,
-            id: tile.id,
-            stressStatus: tile.stress, // Stress status from the first API
-            waterStress, // Water stress from the second API
-            actionForAverage, // Action derived from the second API
-          };
-        })
-      );
-
-      setData(transformedData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+ // Fetch the tile data and merge it with water stress info
+const fetchTileData = async () => {
+  try {
+    const tileResponse = await fetch(TILE_API_URL);
+    if (!tileResponse.ok) {
+      throw new Error('Failed to fetch tile data');
     }
-  };
+    const tiles = await tileResponse.json();
+
+    // Calculate the number of columns dynamically from the tile data if not defined
+    const maxColIndex = Math.max(...tiles.map((tile: any) => parseInt(tile.rowCol.split('_')[1])));
+    const numCols = maxColIndex + 1; // Assuming column indices start at 0
+
+    // Transform the tile data and fetch water stress for each tile
+    const transformedData: TileData[] = await Promise.all(
+      tiles.map(async (tile: any) => {
+        const { waterStress, actionForAverage } = await fetchWaterStress(tile.id);
+        
+        // Extract row and col indices from tile.rowCol (format: "row_col")
+        const [rowIndex, colIndex] = tile.rowCol.split('_').map(Number);
+
+        // Calculate the blockId
+        const blockId = rowIndex * numCols + colIndex + 1;
+
+        return {
+          rowCol: `B${blockId}`, // Assign blockId as "B{blockId}"
+          id: tile.id,
+          stressStatus: tile.stress, // Stress status from the first API
+          waterStress, // Water stress from the second API
+          actionForAverage, // Action derived from the second API
+        };
+      })
+    );
+
+    setData(transformedData);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
 
   useEffect(() => {
     fetchTileData();
@@ -90,7 +102,7 @@ const StressTb: React.FC = () => {
 
   // Define table columns
   const columns = [
-    { label: 'Block ID (Row_Column)', key: 'rowCol' },
+    { label: 'Block ID', key: 'rowCol' },
     { label: 'Stress Status', key: 'stressStatus' },
     { label: 'Water Stress or Not', key: 'waterStress' },
     { label: 'Action for Average', key: 'actionForAverage' },
@@ -133,7 +145,7 @@ const StressTb: React.FC = () => {
         <DialogContent style={{ backgroundColor: '#F1F8E9' }}>
           {selectedData ? (
             <>
-              <Typography variant="h6" color="textPrimary"><strong>Block ID (Row_Column):</strong> {selectedData.rowCol}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Block ID :</strong> {selectedData.rowCol}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Stress Status:</strong> {selectedData.stressStatus}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Water Stress or Not:</strong> {selectedData.waterStress}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Action for Average:</strong> {selectedData.actionForAverage}</Typography>

@@ -57,12 +57,23 @@ const DiseaseTb: React.FC = () => {
         throw new Error('Failed to fetch tile data');
       }
       const tiles = await tileResponse.json();
-
+  
+      // Calculate the number of columns dynamically based on the maximum column index in rowCol
+      const maxColIndex = Math.max(...tiles.map((tile: any) => parseInt(tile.rowCol.split('_')[1])));
+      const numCols = maxColIndex + 1; // Assuming column indices start at 0
+  
       const transformedData: IoTData[] = await Promise.all(
         tiles.map(async (tile: any) => {
           const diseaseVulnerability = await fetchDiseaseVulnerability(tile.id);
+  
+          // Extract row and column indices from tile.rowCol (format: "row_col")
+          const [rowIndex, colIndex] = tile.rowCol.split('_').map(Number);
+  
+          // Calculate the blockId
+          const blockId = rowIndex * numCols + colIndex + 1;
+  
           return {
-            rowCol: tile.rowCol,
+            rowCol: `B${blockId}`, // Set rowCol to formatted blockId as "B{blockId}"
             id: tile.id,
             recordedDateTime: `${tile.createdDate}, ${convertTo12HourFormat(tile.createdDate.split(' ')[1])}`,
             temperature: tile.temperature,
@@ -72,13 +83,15 @@ const DiseaseTb: React.FC = () => {
           };
         })
       );
-
+  
+      // Sort data by id and set the state
       const sortedData = transformedData.sort((a, b) => b.id - a.id);
       setData(sortedData);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
+  
 
   useEffect(() => {
     fetchTileData();
@@ -90,7 +103,7 @@ const DiseaseTb: React.FC = () => {
   };
 
   const columns = [
-    { label: 'Block ID (Row_Column)', key: 'rowCol' },
+    { label: 'Block ID ', key: 'rowCol' },
     { label: 'Temperature (℃)', key: 'temperature' },
     { label: 'Humidity (%)', key: 'humidity' },
     { label: 'UV Level', key: 'uvLevel' },
@@ -131,7 +144,7 @@ const DiseaseTb: React.FC = () => {
         <DialogContent style={{ backgroundColor: '#F1F8E9' }}>
           {selectedData ? (
             <>
-              <Typography variant="h6" color="textPrimary"><strong>Block ID (Row_Column):</strong> {selectedData.rowCol}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Block ID :</strong> {selectedData.rowCol}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} °C</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
               <Typography variant="h6" color="textPrimary"><strong>UV Level:</strong> {selectedData.uvLevel}</Typography>

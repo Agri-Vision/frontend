@@ -21,36 +21,47 @@ const YeildTb: React.FC = () => {
   const PREDICTION_API_URL = (taskId: number) => `${API_BASE_URL}/prediction/yield/${taskId}/1`;
 
   // Fetch tile data
-  const fetchTileData = async () => {
-    try {
-      const tileResponse = await fetch(TILE_API_URL);
-      if (!tileResponse.ok) {
-        throw new Error('Failed to fetch tiles');
-      }
-      const tiles = await tileResponse.json();
-
-      // For each tile, fetch the possible condition from the prediction API
-      const tileDataWithPrediction = await Promise.all(
-        tiles.map(async (tile: any) => {
-          const predictionResponse = await fetch(PREDICTION_API_URL(tile.id));
-          if (!predictionResponse.ok) {
-            throw new Error(`Failed to fetch prediction for tile ID: ${tile.id}`);
-          }
-          const predictionResult = await predictionResponse.json();
-
-          return {
-            id: tile.rowCol,
-            yieldEstimation: tile.yield, // Yield estimation from API response
-            conditionStatus: predictionResult.result, // Prediction result from second API
-          };
-        })
-      );
-
-      setData(tileDataWithPrediction);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+const fetchTileData = async () => {
+  try {
+    const tileResponse = await fetch(TILE_API_URL);
+    if (!tileResponse.ok) {
+      throw new Error('Failed to fetch tiles');
     }
-  };
+    const tiles = await tileResponse.json();
+
+    // Calculate the number of columns dynamically from the tile data if not defined
+    const maxColIndex = Math.max(...tiles.map((tile: any) => parseInt(tile.rowCol.split('_')[1])));
+    const numCols = maxColIndex + 1; // Assuming column indices start at 0
+
+    // For each tile, fetch the possible condition from the prediction API and calculate blockId
+    const tileDataWithPrediction = await Promise.all(
+      tiles.map(async (tile: any) => {
+        const predictionResponse = await fetch(PREDICTION_API_URL(tile.id));
+        if (!predictionResponse.ok) {
+          throw new Error(`Failed to fetch prediction for tile ID: ${tile.id}`);
+        }
+        const predictionResult = await predictionResponse.json();
+
+        // Extract row and column indices from tile.rowCol (format: "row_col")
+        const [rowIndex, colIndex] = tile.rowCol.split('_').map(Number);
+
+        // Calculate the blockId
+        const blockId = rowIndex * numCols + colIndex + 1;
+
+        return {
+          id: `B${blockId}`, // Set blockId as "B{blockId}"
+          yieldEstimation: tile.yield, // Yield estimation from API response
+          conditionStatus: predictionResult.result, // Prediction result from second API
+        };
+      })
+    );
+
+    setData(tileDataWithPrediction);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
 
   useEffect(() => {
     fetchTileData();
@@ -63,7 +74,7 @@ const YeildTb: React.FC = () => {
 
   // Define table columns
   const columns = [
-    { label: 'Block ID (Row_Column)', key: 'id' },
+    { label: 'Block ID ', key: 'id' },
     { label: 'Yield Estimation (Kg)', key: 'yieldEstimation' },
     { label: 'Possible Condition', key: 'conditionStatus' },
   ];
@@ -83,7 +94,7 @@ const YeildTb: React.FC = () => {
         <DialogContent style={{ backgroundColor: '#F1F8E9' }}>
           {selectedData ? (
             <>
-              <Typography variant="h6" color="textPrimary"><strong>Block ID (Row_Column):</strong> {selectedData.rowCol}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Block ID :</strong> {selectedData.rowCol}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Yield Estimation:</strong> {selectedData.yieldEstimation} Kg</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Possible Condition:</strong> {selectedData.conditionStatus}</Typography>
             </>
