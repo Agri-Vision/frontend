@@ -5,6 +5,13 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typogra
 import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface TileData {
+  altitude: string;
+  soilMoisture: string;
+  pressure: string;
+  uvLevel: string;
+  humidity: string;
+  temperature: string;
+  ndvi: string;
   rowCol: string;
   id: number;
   yieldEstimation: string;
@@ -55,6 +62,14 @@ const fetchTileData = async () => {
           id: `B${blockId}`, // Set blockId as "B{blockId}"
           yieldEstimation: tile.yield, // Yield estimation from API response
           conditionStatus: predictionResult.result, // Prediction result from second API
+          ndvi: tile.ndvi,
+          temperature: tile.temperature,
+          humidity: tile.humidity,
+          uvLevel: tile.uvLevel,
+          soilMoisture: tile.soilMoisture,
+          pressure: tile.pressure,
+          altitude: tile.altitude,
+
         };
       })
     );
@@ -157,6 +172,13 @@ const fetchTileData = async () => {
               <Typography variant="h6" color="textPrimary"><strong>Block ID :</strong> {selectedData.id}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Yield Estimation:</strong> {selectedData.yieldEstimation} Kg</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Possible Condition:</strong> {selectedData.conditionStatus}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>NDVI Value:</strong> {selectedData.ndvi}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} ℃</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>uvLevel:</strong> {selectedData.uvLevel}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>soilMoisture:</strong> {selectedData.soilMoisture}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>pressure:</strong> {selectedData.pressure} Pa</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>altitude:</strong> {selectedData.altitude} m</Typography>
             </>
           ) : (
             <Typography variant="body1">Loading...</Typography>
