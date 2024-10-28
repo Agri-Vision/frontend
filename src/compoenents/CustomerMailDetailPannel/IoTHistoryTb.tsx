@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, CircularProgress } from '@mui/material';
 
 interface IoTData {
   id: number;
@@ -17,6 +17,7 @@ const IoTHistoryTb: React.FC = () => {
   const [data, setData] = useState<IoTData[]>([]);
   const [selectedData, setSelectedData] = useState<IoTData | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -51,6 +52,7 @@ const IoTHistoryTb: React.FC = () => {
   };
 
   useEffect(() => {
+    setLoading(true); 
     const fetchIoTData = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/iot/get_enviroment_data`);
@@ -74,6 +76,8 @@ const IoTHistoryTb: React.FC = () => {
         setData(sortedData);
       } catch (error) {
         console.error('Error fetching IoT data:', error);
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
       }
     };
 
@@ -119,7 +123,16 @@ const IoTHistoryTb: React.FC = () => {
   return (
     <div className="history-table-container">
       <h2>IOT History</h2>
-      <ReusableTable columns={columns} data={data} onRowClick={handleRowClick} recordsPerPage={5} />
+
+      {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <ReusableTable columns={columns} data={data} onRowClick={handleRowClick} recordsPerPage={5} />
+      )}
+
+      
 
       {/* MUI Modal for showing IoT data details */}
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{

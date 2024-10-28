@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, CircularProgress } from '@mui/material';
 import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface IoTData {
@@ -20,6 +20,7 @@ const DiseaseTb: React.FC = () => {
   const [data, setData] = useState<IoTData[]>([]);
   const [selectedData, setSelectedData] = useState<IoTData | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { highlightedBlock, highlightBlock, removeHighlight } = useMapHighlightContext();
 
@@ -54,6 +55,7 @@ const DiseaseTb: React.FC = () => {
   };
 
   const fetchTileData = async () => {
+    setLoading(true); 
     try {
       const tileResponse = await fetch(TILE_API_URL);
       if (!tileResponse.ok) {
@@ -92,6 +94,8 @@ const DiseaseTb: React.FC = () => {
       setData(sortedData);
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false once data is fetched
     }
   };
   
@@ -173,7 +177,13 @@ const DiseaseTb: React.FC = () => {
     <div className="history-table-container" style={{ marginTop: '30px' }}>
       <Typography variant="h4" mb={2}>Disease Analysis</Typography>
 
-      <Box display="flex" alignItems="center" mb={2}>
+      {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
+          <Box display="flex" alignItems="center" mb={2}>
         <Box display="flex" alignItems="center" mr={2}>
           <Box width={10} height={10} borderRadius="50%" bgcolor="rgba(0, 128, 0, 0.7)" mr={1} />
           <Typography variant="body2">Low Vulnerability to Diseases</Typography>
@@ -193,6 +203,10 @@ const DiseaseTb: React.FC = () => {
       </Box>
 
       <ReusableTable columns={columns} data={data} onRowClick={handleViewClick} recordsPerPage={5} />
+        </div>
+      )}
+
+      
 
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{
         style: {

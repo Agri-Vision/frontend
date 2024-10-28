@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../assets/styles/leftColumnBtn.css';
-import Button from '@mui/material/Button'; 
+import {Button, CircularProgress, Box} from '@mui/material'; 
 import { useButtonContext } from '../ButtonContext'; // Import the context
 
 interface IoTData {
@@ -15,12 +15,13 @@ interface IoTData {
 const LeftColumnBtn: React.FC = () => {
   const [iotData, setIotData] = useState<IoTData | null>(null);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+  const [loading, setLoading] = useState(true);
   // Importing from ButtonContext to toggle stress, yield, and disease
   const { isStressActive, toggleStress, isDiseaseActive, toggleDisease, isYieldActive, toggleYield } = useButtonContext();
 
   // Function to fetch the latest IoT data
   const fetchIoTData = async () => {
+    setLoading(true); 
     try {
       const response = await fetch(`${API_BASE_URL}/iot/get_enviroment_data`);
       const data = await response.json();
@@ -41,6 +42,8 @@ const LeftColumnBtn: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching IoT data:", error);
+    } finally {
+      setLoading(false); // Set loading to false once data is fetched
     }
   };
 
@@ -112,33 +115,90 @@ const LeftColumnBtn: React.FC = () => {
       </div>
       <div className="info-container">
         <div className="info-card highlight-temperature">
+        {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
           <span className="info-value">{iotData?.temperature ? `${parseFloat(iotData.temperature).toFixed(1)}`: 'N/A'} &#8451; </span>
-          <span className="info-label">Temperature</span>
+        <span className="info-label">Temperature</span>
         </div>
+      )}
+        </div>
+
         <div className="info-card highlight-humidity">
-          <span className="info-value">{iotData?.humidity ? `${parseFloat(iotData.humidity).toFixed(1)}`: 'N/A'} %</span>
-          <span className="info-label">Humidity</span>
+        {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
+           <span className="info-value">{iotData?.humidity ? `${parseFloat(iotData.humidity).toFixed(1)}`: 'N/A'} % </span>
+           <span className="info-label">Humidity</span>
         </div>
+      )}
+
+        </div>
+
         <div className="info-card highlight-soil">
-  <span className="info-value-soil">
-    {iotData?.soilMoisture
-      ? `${((parseFloat(iotData.soilMoisture) - 205) * 100 / (580 - 205)).toFixed(1)}%`
-      : 'N/A'}
-  </span>
-  <span className="info-label">Soil Moisture</span>
-</div>
+
+        {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
+          <span className="info-value-soil">
+                  {iotData?.soilMoisture
+                    ? `${((parseFloat(iotData.soilMoisture) - 205) * 100 / (580 - 205)).toFixed(1)}%`
+                    : 'N/A'}
+                </span><br></br>
+                <span className="info-label">Soil Moisture</span>
+        </div>
+      )}
+
+                
+          </div>
 
         <div className="info-card highlight-uv">
-          <span className="info-value">{iotData?.uvLevel ?? 'N/A'}</span>
-          <span className="info-label">UV</span>
+        {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
+         <span className="info-value">{iotData?.uvLevel ?? 'N/A'}</span><br></br>
+         <span className="info-label">UV</span>
+        </div>
+      )}
+          
         </div>
         <div className="info-card highlight-pressure">
-          <span className="info-value-soil">{iotData?.pressure ? `${parseFloat(iotData.pressure).toFixed(1)}`: 'N/A'} Pa</span>
+        {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
+          <span className="info-value-soil">{iotData?.pressure ? `${parseFloat(iotData.pressure).toFixed(1)}`: 'N/A'} Pa</span><br></br>
           <span className="info-label">Atmo.Pressure</span>
         </div>
+      )}
+          
+        </div>
         <div className="info-card highlight-altitude">
-          <span className="info-value">{iotData?.altitude ? `${parseFloat(iotData.altitude).toFixed(1)}`: 'N/A'} m</span>
+        {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
+          <span className="info-value">{iotData?.altitude ? `${parseFloat(iotData.altitude).toFixed(1)}`: 'N/A'} m</span><br></br>
           <span className="info-label">Altitude</span>
+        </div>
+      )}
+          
         </div>
       </div>
       <div className="real-time-text">

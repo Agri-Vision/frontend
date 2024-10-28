@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, CircularProgress  } from '@mui/material';
 import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface TileData {
@@ -24,6 +24,7 @@ const YeildTb: React.FC = () => {
   const [data, setData] = useState<TileData[]>([]);
   const [selectedData, setSelectedData] = useState<TileData | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { highlightedBlock, highlightBlock, removeHighlight } = useMapHighlightContext();
 
@@ -42,6 +43,7 @@ const YeildTb: React.FC = () => {
 
   // Fetch tile data
 const fetchTileData = async () => {
+  setLoading(true); 
   try {
     const tileResponse = await fetch(TILE_API_URL);
     if (!tileResponse.ok) {
@@ -87,6 +89,8 @@ const fetchTileData = async () => {
     setData(tileDataWithPrediction);
   } catch (error) {
     console.error('Error fetching data:', error);
+  } finally {
+    setLoading(false); // Set loading to false once data is fetched
   }
 };
 
@@ -159,7 +163,17 @@ const fetchTileData = async () => {
   return (
     <div className="history-table-container">
       <h2>Yield Analysis</h2>
-      <ReusableTable columns={columns} data={data} onRowClick={handleViewClick} recordsPerPage={5} />
+
+      {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <ReusableTable columns={columns} data={data} onRowClick={handleViewClick} recordsPerPage={5} />
+      )}
+
+
+      
 
       {/* MUI Modal for showing Tile data details */}
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{

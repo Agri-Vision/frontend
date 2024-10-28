@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, CircularProgress } from '@mui/material';
 import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface TileData {
@@ -25,6 +25,7 @@ const StressTb: React.FC = () => {
   const [data, setData] = useState<TileData[]>([]);
   const [selectedData, setSelectedData] = useState<TileData | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (tileId: number) => `${API_BASE_URL}/prediction/stress/${tileId}`;
@@ -71,6 +72,7 @@ const StressTb: React.FC = () => {
 
  // Fetch the tile data and merge it with water stress info
 const fetchTileData = async () => {
+  setLoading(true); 
   try {
     const tileResponse = await fetch(TILE_API_URL);
     if (!tileResponse.ok) {
@@ -114,6 +116,8 @@ const fetchTileData = async () => {
     setData(transformedData);
   } catch (error) {
     console.error('Error fetching data:', error);
+  } finally {
+    setLoading(false); // Set loading to false once data is fetched
   }
 };
 
@@ -190,7 +194,14 @@ const fetchTileData = async () => {
     <div className="history-table-container" style={{ marginTop: '30px' }}>
       <Typography variant="h4" mb={2}>Stress Analysis</Typography>
 
-      <Box display="flex" alignItems="center" mb={2}>
+
+      {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <div>
+        <Box display="flex" alignItems="center" mb={2}>
         <Box display="flex" alignItems="center" mr={2}>
           <Box width={10} height={10} borderRadius="50%" bgcolor="rgba(128, 128, 128, 0.2)" mr={1} />
           <Typography variant="body2">Not Vulnerability to Stress</Typography>
@@ -203,15 +214,22 @@ const fetchTileData = async () => {
           <Box width={10} height={10} borderRadius="50%" bgcolor="rgba(0, 0, 255, 0.2)" mr={1} />
           <Typography variant="body2">Vulnerable to Water Stress</Typography>
         </Box>
-        
       </Box>
 
-      <ReusableTable 
+<ReusableTable 
         columns={columns} 
         data={data} 
         onRowClick={handleViewClick} 
         recordsPerPage={5} 
       />
+      </div>
+
+      )}
+
+      
+   
+
+      
 
       {/* MUI Modal for showing Tile data details */}
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{
