@@ -10,10 +10,12 @@ const AgentDashboard: React.FC = () => {
     const [upToDateProjects, setUpToDateProjects] = useState<any[]>([]);
     const agentId = 2; // Hardcoded agent ID for now
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/project/agent/${agentId}`);
+                const response = await fetch(`${API_BASE_URL}/project/agent/${agentId}`);
                 const data = await response.json();
 
                 // Categorize the projects into the appropriate sections based on their status

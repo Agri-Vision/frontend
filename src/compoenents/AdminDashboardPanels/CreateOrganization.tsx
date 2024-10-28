@@ -7,7 +7,7 @@ interface Plantation {
     plantationName: string;
     address: string;
     contactNo: string;
-    plantationImg: string | null; // Store the uploaded image filename
+    plantationImg: string | null;
     currentLatitude: string;
     currentLongitude: string;
 }
@@ -17,6 +17,7 @@ const CreateOrganization: React.FC = () => {
     const [orgName, setOrgName] = useState('');
     const [district, setDistrict] = useState('');
     const [orgImage, setOrgImage] = useState<string | null>(null);
+    const [orgImagePreview, setOrgImagePreview] = useState<string | null>(null);
     const [plantations, setPlantations] = useState<Plantation[]>([
         {
             plantationName: '',
@@ -27,9 +28,12 @@ const CreateOrganization: React.FC = () => {
             currentLongitude: '',
         },
     ]);
+    const [plantationPreviews, setPlantationPreviews] = useState<Record<number, string | null>>({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     const handleAddPlantation = () => {
         setPlantations([
@@ -50,6 +54,9 @@ const CreateOrganization: React.FC = () => {
             const newPlantations = [...plantations];
             newPlantations.splice(index, 1);
             setPlantations(newPlantations);
+            const newPreviews = { ...plantationPreviews };
+            delete newPreviews[index];
+            setPlantationPreviews(newPreviews);
         }
     };
 
@@ -61,9 +68,9 @@ const CreateOrganization: React.FC = () => {
 
     const handleImageUpload = async (base64: string): Promise<string | null> => {
         try {
-            const response = await axios.post('http://localhost:8080/utility/file/upload', base64, {
+            const response = await axios.post(`${API_BASE_URL}/utility/file/upload`, base64, {
                 headers: {
-                    'Content-Type': 'text/plain', // Send raw base64 as plain text
+                    'Content-Type': 'text/plain',
                 },
             });
             return response.data.result;
@@ -83,6 +90,7 @@ const CreateOrganization: React.FC = () => {
                 const uploadedFileName = await handleImageUpload(base64);
                 if (uploadedFileName) {
                     setOrgImage(uploadedFileName);
+                    setOrgImagePreview(URL.createObjectURL(file));
                 }
             };
             reader.readAsDataURL(file);
@@ -98,6 +106,7 @@ const CreateOrganization: React.FC = () => {
                 const uploadedFileName = await handleImageUpload(base64);
                 if (uploadedFileName) {
                     handlePlantationChange(index, 'plantationImg', uploadedFileName);
+                    setPlantationPreviews((prev) => ({ ...prev, [index]: URL.createObjectURL(file) }));
                 }
             };
             reader.readAsDataURL(file);
@@ -131,15 +140,15 @@ const CreateOrganization: React.FC = () => {
 
         try {
             setLoading(true);
-            await axios.post('http://localhost:8080/org', organizationData, {
+            await axios.post(`${API_BASE_URL}/org`, organizationData, {
                 headers: { 'Content-Type': 'application/json' },
             });
             setSuccessMessage('Organization created successfully!');
-            // Clear the form fields after successful submission
             setOrgCode('');
             setOrgName('');
             setDistrict('');
             setOrgImage(null);
+            setOrgImagePreview(null);
             setPlantations([
                 {
                     plantationName: '',
@@ -150,6 +159,7 @@ const CreateOrganization: React.FC = () => {
                     currentLongitude: '',
                 },
             ]);
+            setPlantationPreviews({});
         } catch (error) {
             setError('An error occurred while creating the organization');
         } finally {
@@ -158,30 +168,30 @@ const CreateOrganization: React.FC = () => {
     };
 
     return (
-        <Box sx={{ padding: 2, maxWidth: '800px', margin: '0 auto' }}>
-            <Typography 
+        <Box sx={{ padding: 3, maxWidth: '900px', margin: 'auto', borderRadius: '10px', backgroundColor: '#f8f8f8' }}>
+            <Typography
                 variant="h5"
                 component="h2"
                 gutterBottom
-                sx={{ fontFamily: 'Poppins , sans-serif', fontWeight: 'bold', color: '#5D6965' }}
+                sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 'bold', color: '#4a4a4a', textAlign: 'center', marginBottom: 3 }}
             >
                 Create New Organization
             </Typography>
 
             {error && (
-                <Typography color="error" sx={{ marginBottom: 2 }}>
+                <Typography color="error" sx={{ marginBottom: 2, textAlign: 'center' }}>
                     {error}
                 </Typography>
             )}
 
             {successMessage && (
-                <Typography color="success" sx={{ marginBottom: 2 }}>
+                <Typography color="primary" sx={{ marginBottom: 2, textAlign: 'center', fontWeight: 'bold' }}>
                     {successMessage}
                 </Typography>
             )}
 
             <form onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
+                <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
@@ -213,21 +223,24 @@ const CreateOrganization: React.FC = () => {
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <Button variant="contained" component="label">
+                        <Button variant="outlined" component="label" fullWidth sx={{ padding: '10px' }}>
                             Upload Organization Image
                             <input hidden type="file" accept="image/*" onChange={handleOrgImageChange} />
                         </Button>
-                        {orgImage && (
-                            <Typography sx={{ marginTop: 1 }}>
-                                Image uploaded successfully: {orgImage}
-                            </Typography>
+                        {orgImagePreview && (
+                            <Box mt={2} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                                <img src={orgImagePreview} alt="Organization Preview" style={{ width: '120px', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }} />
+                                <Typography sx={{ alignSelf: 'center' }}>Image uploaded successfully</Typography>
+                            </Box>
                         )}
                     </Grid>
 
                     {plantations.map((plantation, index) => (
                         <Grid item xs={12} key={index}>
-                            <Paper sx={{ padding: 2, marginBottom: 2 }}>
-                                <Typography variant="h6">Plantation {index + 1}</Typography>
+                            <Paper sx={{ padding: 3, borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                                    Plantation {index + 1}
+                                </Typography>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6}>
                                         <TextField
@@ -260,14 +273,15 @@ const CreateOrganization: React.FC = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
-                                        <Button variant="contained" component="label">
+                                        <Button variant="outlined" component="label" fullWidth sx={{ padding: '10px' }}>
                                             Upload Plantation Image
                                             <input hidden type="file" accept="image/*" onChange={(e) => handlePlantationImageChange(index, e)} />
                                         </Button>
-                                        {plantation.plantationImg && (
-                                            <Typography sx={{ marginTop: 1 }}>
-                                                Image uploaded successfully: {plantation.plantationImg}
-                                            </Typography>
+                                        {plantationPreviews[index] && (
+                                            <Box mt={2} sx={{ display: 'flex', gap: 2 }}>
+                                                <img src={plantationPreviews[index] || ''} alt={`Plantation ${index + 1} Preview`} style={{ width: '100px', borderRadius: '5px' }} />
+                                                <Typography sx={{ alignSelf: 'center' }}>Image uploaded successfully</Typography>
+                                            </Box>
                                         )}
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -303,18 +317,19 @@ const CreateOrganization: React.FC = () => {
                     ))}
 
                     <Grid item xs={12}>
-                        <Button variant="outlined" onClick={handleAddPlantation}>
+                        <Button variant="outlined" onClick={handleAddPlantation} fullWidth sx={{ marginBottom: 3 }}>
                             Add Another Plantation
                         </Button>
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            type="submit" 
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            type="submit"
                             disabled={loading}
                             fullWidth
+                            sx={{ padding: '12px', borderRadius: '8px' }}
                         >
                             {loading ? <CircularProgress size={24} /> : 'Create Organization'}
                         </Button>
