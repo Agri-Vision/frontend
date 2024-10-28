@@ -246,7 +246,7 @@ const fetchTileData = async () => {
               <Typography variant="h6" color="textPrimary"><strong>Water Stress or Not:</strong> {selectedData.waterStress}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Action for Average:</strong> {selectedData.actionForAverage}</Typography>
 
-              <Typography variant="h6" color="textPrimary"><strong>RENDVI Value:</strong> {selectedData.rendvi}</Typography>
+              {/* <Typography variant="h6" color="textPrimary"><strong>RENDVI Value:</strong> {selectedData.rendvi}</Typography> */}
               <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} ℃</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
               <Typography variant="h6" color="textPrimary"><strong>UV Level:</strong> {selectedData.uvLevel}</Typography>

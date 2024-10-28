@@ -50,10 +50,10 @@ const ReusableTable: React.FC<TableProps> = ({ columns, data, recordsPerPage = 5
     if (columnKey === 'diseaseVulnerability') {
       const percentage = extractPercentage(value);
       if (percentage !== null) {
-        if (percentage < 25) return 'rgba(255, 0, 0, 0.2)'; // Red for <25%
-        if (percentage >= 25 && percentage < 50) return 'rgba(255, 165, 0, 0.2)'; // Orange for 25-50%
-        if (percentage >= 50 && percentage < 75) return 'rgba(255, 255, 0, 0.2)'; // Yellow for 50-75%
-        if (percentage >= 75) return 'rgba(0, 128, 0, 0.2)'; // Green for 75-100%
+        if (percentage < 25) return 'rgba(0, 128, 0, 0.2)'; // Green for <25%
+        if (percentage >= 25 && percentage < 50) return 'rgba(255, 255, 0, 0.2)'; // Yellow for 25-50%
+        if (percentage >= 50 && percentage < 75) return 'rgba(255, 165, 0, 0.2)'; //  Orange for 50-75%
+        if (percentage >= 75) return 'rgba(255, 0, 0, 0.2)'; // Red for 75-100%
       }
       return 'transparent';
     }

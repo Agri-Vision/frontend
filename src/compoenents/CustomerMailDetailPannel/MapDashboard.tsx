@@ -112,7 +112,7 @@ const MapDashboard: React.FC = () => {
         (t) => t.row === rowIndex && t.col === colIndex
       );
       return tile
-        ? `B${rowIndex * numCols + colIndex + 1} Yield- ${tile.yield}, Stress- ${tile.stress}, Disease- ${tile.disease}`
+        ? `B${rowIndex * numCols + colIndex + 1} ${tile.rowCol}  Yield- ${tile.yield}, Stress- ${tile.stress}, Disease- ${tile.disease}`
         : `B${rowIndex * numCols + colIndex + 1} Yield- N/A, Stress- N/A, Disease- N/A`;
     })
   );
@@ -131,8 +131,8 @@ const MapDashboard: React.FC = () => {
 
   // Function to determine yield color intensity
   const getYieldColor = (yieldValue: number) => {
-    const normalizedValue = Math.min(Math.max(yieldValue, 0), 30); // Cap the value between 0 and 30
-    const intensity = Math.floor((normalizedValue / 30) * 255);
+    const normalizedValue = Math.min(Math.max(yieldValue, 0), 5); // Cap the value between 0 and 30
+    const intensity = Math.floor((normalizedValue / 5) * 255);
     return `rgba(0, ${intensity}, 0, 0.6)`; // Green with varying intensity
   };
 
