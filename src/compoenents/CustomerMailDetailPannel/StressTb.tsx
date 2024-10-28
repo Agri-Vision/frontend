@@ -5,6 +5,13 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, 
 import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface TileData {
+  altitude: string;
+  pressure: string;
+  soilMoisture: string;
+  uvLevel: string;
+  humidity: string;
+  temperature: string;
+  rendvi: string;
   rowCol: string;
   id: number;
   stressStatus: string;
@@ -92,6 +99,14 @@ const fetchTileData = async () => {
           stressStatus: tile.stress, // Stress status from the first API
           waterStress, // Water stress from the second API
           actionForAverage, // Action derived from the second API
+
+          rendvi: tile.rendvi,
+          temperature: tile.temperature,
+          humidity: tile.humidity,
+          uvLevel: tile.uvLevel,
+          soilMoisture: tile.soilMoisture,
+          pressure: tile.pressure,
+          altitude: tile.altitude,
         };
       })
     );
@@ -212,6 +227,14 @@ const fetchTileData = async () => {
               <Typography variant="h6" color="textPrimary"><strong>Stress Status:</strong> {selectedData.stressStatus}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Water Stress or Not:</strong> {selectedData.waterStress}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Action for Average:</strong> {selectedData.actionForAverage}</Typography>
+
+              <Typography variant="h6" color="textPrimary"><strong>RENDVI Value:</strong> {selectedData.rendvi}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} ℃</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>UV Level:</strong> {selectedData.uvLevel}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Soil Moisture:</strong>{((parseFloat(selectedData.soilMoisture) - 205) * 100 / (580 - 205)).toFixed(1)} %</Typography>
+              {/* <Typography variant="h6" color="textPrimary"><strong>Atmo.Pressure:</strong> {selectedData.pressure} Pa</Typography> */}
+              <Typography variant="h6" color="textPrimary"><strong>Altitude:</strong> {selectedData.altitude} m</Typography>
             </>
           ) : (
             <Typography variant="body1">Loading...</Typography>

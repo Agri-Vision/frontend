@@ -22,12 +22,12 @@ const IoTHistoryTb: React.FC = () => {
 
   // Ideal conditions for tea plantations in Sri Lanka
   const idealConditions = {
-    temperature: { min: 18, max: 30, label: "°C" },
-    humidity: { min: 70, max: 90, label: "%" },
+    temperature: { min: 18, max: 30, label: "" },
+    humidity: { min: 70, max: 90, label: "" },
     uvLevel: { min: 0, max: 3, label: "" },
     soilMoisture: { min: 200, max: 400, label: "" },
-    pressure: { min: 100000, max: 102000, label: "Pa" },
-    altitude: { min: 600, max: 2500, label: "m" },
+    pressure: { min: 100000, max: 102000, label: "" },
+    altitude: { min: 600, max: 2500, label: "" },
   };
 
   // Function to compare the IoT data to the ideal conditions
@@ -62,12 +62,12 @@ const IoTHistoryTb: React.FC = () => {
         const transformedData: IoTData[] = result.map((item: any) => ({
           id: item.id,
           recordedDateTime: `${item.recorded_date}, ${convertTo12HourFormat(item.recorded_time)}`,
-          temperature: item.temperature,
-          humidity: item.humidity,
+          temperature: `${parseFloat(item.temperature).toFixed(0)} ℃` ,
+          humidity: `${parseFloat(item.humidity).toFixed(0)} %` ,
           uvLevel: item.uvLevel,
-          soilMoisture: item.soilMoisture,
-          pressure: item.pressure,
-          altitude: item.altitude,
+          soilMoisture: `${((parseFloat(item.soilMoisture) - 205) * 100 / (580 - 205)).toFixed(1)} %` ,
+          pressure: `${parseFloat(item.pressure).toFixed(1)} Pa` ,
+          altitude: `${parseFloat(item.altitude).toFixed(0)} m` ,
         }));
 
         const sortedData = transformedData.sort((a, b) => b.id - a.id);
@@ -94,6 +94,26 @@ const IoTHistoryTb: React.FC = () => {
     { label: 'Soil Moisture', key: 'soilMoisture' },
     { label: 'Pressure', key: 'pressure' },
     { label: 'Altitude', key: 'altitude' },
+    {
+      label: 'View',
+      key: 'view',
+      render: (rowData: IoTData) => (
+        <Button onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering row click
+          handleRowClick(rowData);
+        }} 
+        sx={{
+          fontFamily: 'Nunito, Poppins, sans-serif',
+          padding: '4px 8px',
+          fontSize: '0.85rem',
+          minWidth: '80px',
+          height: '32px'
+        }}
+        variant="contained" color="primary">
+          View
+        </Button>
+      )
+    }
   ];
 
   return (
@@ -118,7 +138,7 @@ const IoTHistoryTb: React.FC = () => {
                 <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
                   <Typography variant="h6">Temperature</Typography>
                   <Typography variant="body1" fontWeight="bold">
-                    {selectedData.temperature} °C
+                    {selectedData.temperature} 
                   </Typography>
                   <Typography variant="body2">
                     Status: {checkValue(parseFloat(selectedData.temperature), idealConditions.temperature)}
@@ -129,7 +149,7 @@ const IoTHistoryTb: React.FC = () => {
                 <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
                   <Typography variant="h6">Humidity</Typography>
                   <Typography variant="body1" fontWeight="bold">
-                    {selectedData.humidity} %
+                    {selectedData.humidity} 
                   </Typography>
                   <Typography variant="body2">
                     Status: {checkValue(parseFloat(selectedData.humidity), idealConditions.humidity)}
@@ -165,7 +185,7 @@ const IoTHistoryTb: React.FC = () => {
                 <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
                   <Typography variant="h6">Pressure</Typography>
                   <Typography variant="body1" fontWeight="bold">
-                    {selectedData.pressure} Pa
+                    {selectedData.pressure} 
                   </Typography>
                   <Typography variant="body2">
                     Status: {checkValue(parseFloat(selectedData.pressure), idealConditions.pressure)}
@@ -175,7 +195,7 @@ const IoTHistoryTb: React.FC = () => {
                 <Box style={{ backgroundColor: '#DAF5DB', padding: '10px', borderRadius: '10px', flexGrow: 1, margin: '5px' }}>
                   <Typography variant="h6">Altitude</Typography>
                   <Typography variant="body1" fontWeight="bold">
-                    {selectedData.altitude} m
+                    {selectedData.altitude} 
                   </Typography>
                   <Typography variant="body2">
                     Status: {checkValue(parseFloat(selectedData.altitude), idealConditions.altitude)}

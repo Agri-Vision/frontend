@@ -27,6 +27,16 @@ const YeildTb: React.FC = () => {
 
   const { highlightedBlock, highlightBlock, removeHighlight } = useMapHighlightContext();
 
+  const handleLocateClick = (rowData: TileData) => {
+    if (highlightedBlock === rowData.id) {
+      console.log("Unlocating Block ID:", rowData.id);
+      removeHighlight();
+    } else {
+      console.log("Locating Block ID:", rowData.id);
+      highlightBlock(rowData.id);
+    }
+  };
+
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (taskId: number) => `${API_BASE_URL}/prediction/yield/${taskId}/1`;
 
@@ -90,15 +100,7 @@ const fetchTileData = async () => {
     setShowModal(true);
   };
 
-  const handleLocateClick = (rowData: TileData) => {
-    if (highlightedBlock === rowData.id) {
-      console.log("Unlocating Block ID:", rowData.id);
-      removeHighlight();
-    } else {
-      console.log("Locating Block ID:", rowData.id);
-      highlightBlock(rowData.id);
-    }
-  };
+ 
 
   // Define table columns
   const columns = [
@@ -175,10 +177,10 @@ const fetchTileData = async () => {
               <Typography variant="h6" color="textPrimary"><strong>NDVI Value:</strong> {selectedData.ndvi}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} ℃</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
-              <Typography variant="h6" color="textPrimary"><strong>uvLevel:</strong> {selectedData.uvLevel}</Typography>
-              <Typography variant="h6" color="textPrimary"><strong>soilMoisture:</strong> {selectedData.soilMoisture}</Typography>
-              <Typography variant="h6" color="textPrimary"><strong>pressure:</strong> {selectedData.pressure} Pa</Typography>
-              <Typography variant="h6" color="textPrimary"><strong>altitude:</strong> {selectedData.altitude} m</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>UV Level:</strong> {selectedData.uvLevel}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Soil Moisture:</strong>{((parseFloat(selectedData.soilMoisture) - 205) * 100 / (580 - 205)).toFixed(1)} %</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Atmo.Pressure:</strong> {selectedData.pressure} Pa</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Altitude:</strong> {selectedData.altitude} m</Typography>
             </>
           ) : (
             <Typography variant="body1">Loading...</Typography>

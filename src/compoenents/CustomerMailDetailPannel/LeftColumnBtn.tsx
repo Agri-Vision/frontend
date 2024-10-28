@@ -14,17 +14,15 @@ interface IoTData {
 
 const LeftColumnBtn: React.FC = () => {
   const [iotData, setIotData] = useState<IoTData | null>(null);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Importing from ButtonContext to toggle stress, yield, and disease
   const { isStressActive, toggleStress, isDiseaseActive, toggleDisease, isYieldActive, toggleYield } = useButtonContext();
 
-  // Updated API endpoint
-  const API_BASE_URL = 'http://localhost:8080/iot/get_enviroment_data';
-
   // Function to fetch the latest IoT data
   const fetchIoTData = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}`);
+      const response = await fetch(`${API_BASE_URL}/iot/get_enviroment_data`);
       const data = await response.json();
 
       // Sort the data by the id in descending order
