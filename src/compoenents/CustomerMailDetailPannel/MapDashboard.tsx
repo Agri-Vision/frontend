@@ -6,6 +6,7 @@ import { useMapTypeContext } from '../MapTypeContext'; // For MapTypeContext
 import { useMapHighlightContext } from '../MapHighlightContext';
 
 
+
 declare global {
   interface Window {
     initMap: () => void;  // Extend the Window interface

@@ -59,7 +59,7 @@ const Statistics: React.FC = () => {
             <Grid container spacing={2}>
                 {/* Total Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px',  width: '220px', height: '100px' }}>
                         <Avatar sx={{ bgcolor: metrics.coveredArea.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
@@ -76,7 +76,7 @@ const Statistics: React.FC = () => {
 
                 {/* New Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px',  width: '220px', height: '100px'  }}>
                         <Avatar sx={{ bgcolor: metrics.estimatedYield.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
@@ -93,7 +93,7 @@ const Statistics: React.FC = () => {
 
                 {/* Pending Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' ,  width: '220px', height: '100px' }}>
                         <Avatar sx={{ bgcolor: metrics.IOTDevices.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
@@ -110,7 +110,7 @@ const Statistics: React.FC = () => {
 
                 {/* Completed Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' ,  width: '220px', height: '100px' }}>
                         <Avatar sx={{ bgcolor: metrics.validPeriod.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
