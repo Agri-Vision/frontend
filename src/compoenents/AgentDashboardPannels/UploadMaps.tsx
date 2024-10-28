@@ -32,10 +32,12 @@ const UploadMaps: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/project/${id}`);
+        const response = await axios.get(`${API_BASE_URL}/project/${id}`);
         setProjectDetails(response.data);
       } catch (error) {
         console.error('Error fetching project details:', error);
@@ -51,7 +53,7 @@ const UploadMaps: React.FC = () => {
     const file = event.target.files?.[0];
     if (file) {
       const taskType = mapType.replace('Map', '').toUpperCase();
-      const newFileName = `${file.name.replace(/\.[^/.]+$/, '')}_${taskType}${file.name.match(/\.[^/.]+$/)?.[0] || ''}`;
+      const newFileName = `${file.name.replace(/\.[^/.]+$/, '')}_MS_${taskType}${file.name.match(/\.[^/.]+$/)?.[0] || ''}`;
       const renamedFile = new File([file], newFileName, { type: file.type });
 
       setMapFiles((prev) => ({
@@ -86,7 +88,7 @@ const UploadMaps: React.FC = () => {
     });
 
     try {
-      const response = await axios.put(`http://localhost:8080/project/maps/${id}`, formData);
+      const response = await axios.put(`${API_BASE_URL}/project/maps/${id}`, formData);
       console.log('Upload successful:', response.data);
       setMessage({ type: 'success', text: 'Maps uploaded successfully!' });
     } catch (error) {

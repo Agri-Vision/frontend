@@ -23,11 +23,12 @@ const AdminProjectCreation: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // Fetch agents and plantations when the component mounts
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     useEffect(() => {
         const fetchAgents = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/identity/user/role/agent');
+                const response = await axios.get(`${API_BASE_URL}/identity/user/role/agent`);
                 setAgents(response.data);
             } catch (error) {
                 setError('Failed to fetch agents');
@@ -36,7 +37,7 @@ const AdminProjectCreation: React.FC = () => {
 
         const fetchPlantations = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/plantation');
+                const response = await axios.get(`${API_BASE_URL}/plantation`);
                 setPlantations(response.data);
             } catch (error) {
                 setError('Failed to fetch plantations');
@@ -65,14 +66,10 @@ const AdminProjectCreation: React.FC = () => {
 
         try {
             setLoading(true);
-            console.log(projectData)
-            console.log(projectData.agent)
-            console.log(projectData.plantation)
-            await axios.post('http://localhost:8080/project', projectData, {
+            await axios.post(`${API_BASE_URL}/project`, projectData, {
                 headers: { 'Content-Type': 'application/json' },
             });
             setSuccessMessage('Project created successfully!');
-            // Clear the form fields
             setProjectName('');
             setSelectedAgent('');
             setSelectedPlantation('');
@@ -84,30 +81,29 @@ const AdminProjectCreation: React.FC = () => {
     };
 
     return (
-        <Box sx={{ padding: 2, maxWidth: '600px', margin: '0 auto' }}>
-            <Typography 
+        <Box sx={{ padding: 3, maxWidth: '600px', margin: 'auto', backgroundColor: '#f8f8f8', borderRadius: 2, boxShadow: 2 }}>
+            <Typography
                 variant="h5"
                 component="h2"
-                gutterBottom
-                sx={{ fontFamily: 'Poppins , sans-serif', fontWeight: 'bold', color: '#5D6965' }}
+                sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 'bold', color: '#4a4a4a', textAlign: 'center', mb: 3 }}
             >
                 Create New Project
             </Typography>
 
             {error && (
-                <Typography color="Red" sx={{ marginBottom: 2 }}>
+                <Typography color="error" sx={{ marginBottom: 2, textAlign: 'center', fontWeight: 'bold' }}>
                     {error}
                 </Typography>
             )}
 
             {successMessage && (
-                <Typography color="Green" sx={{ marginBottom: 2 }}>
+                <Typography color="primary" sx={{ marginBottom: 2, textAlign: 'center', fontWeight: 'bold' }}>
                     {successMessage}
                 </Typography>
             )}
 
             <form onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
+                <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
@@ -116,6 +112,7 @@ const AdminProjectCreation: React.FC = () => {
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
                             required
+                            sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -126,6 +123,7 @@ const AdminProjectCreation: React.FC = () => {
                             value={selectedAgent}
                             onChange={(e) => setSelectedAgent(e.target.value)}
                             required
+                            sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                         >
                             {agents.map((agent) => (
                                 <MenuItem key={agent.id} value={agent.id}>
@@ -142,6 +140,7 @@ const AdminProjectCreation: React.FC = () => {
                             value={selectedPlantation}
                             onChange={(e) => setSelectedPlantation(e.target.value)}
                             required
+                            sx={{ backgroundColor: '#fff', borderRadius: 1 }}
                         >
                             {plantations.map((plantation) => (
                                 <MenuItem key={plantation.id} value={plantation.id}>
@@ -151,12 +150,13 @@ const AdminProjectCreation: React.FC = () => {
                         </TextField>
                     </Grid>
                     <Grid item xs={12}>
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            type="submit" 
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            type="submit"
                             disabled={loading}
                             fullWidth
+                            sx={{ padding: '12px', borderRadius: 1, fontWeight: 'bold' }}
                         >
                             {loading ? <CircularProgress size={24} /> : 'Create Project'}
                         </Button>
