@@ -9,7 +9,7 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import GrassIcon from '@mui/icons-material/Grass';
 import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 import { useParams } from 'react-router-dom';
-import { useButtonContext } from '../ButtonContext'; // Import the ButtonContext
+import { useButtonContext } from '../ButtonContext'; 
 
 const Statistics: React.FC = () => {
     const { isYieldActive, isStressActive, isDiseaseActive } = useButtonContext(); // Get the states from context

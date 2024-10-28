@@ -31,18 +31,21 @@ const WeatherTab: React.FC = () => {
         const data = await response.json();
         
         // Extract upper and lower latitude/longitude values
-        const upperLat = parseFloat(data?.taskList?.[0]?.upperLat);
-        const lowerLat = parseFloat(data?.taskList?.[0]?.lowerLat);
-        const upperLng = parseFloat(data?.taskList?.[0]?.upperLng);
-        const lowerLng = parseFloat(data?.taskList?.[0]?.lowerLng);
+        const task = data?.taskList?.find((t: any) => t.taskType === "RGB");
+        if (task) {
+          const upperLat = parseFloat(task?.upperLat);
+          const lowerLat = parseFloat(task?.lowerLat);
+          const upperLng = parseFloat(task?.upperLng);
+          const lowerLng = parseFloat(task?.lowerLng);
 
-        if (upperLat && lowerLat && upperLng && lowerLng) {
-          // Calculate center latitude and longitude
-          const calculatedLat = (upperLat + lowerLat) / 2;
-          const calculatedLon = (upperLng + lowerLng) / 2;
+          if (upperLat && lowerLat && upperLng && lowerLng) {
+            // Calculate center latitude and longitude
+            const calculatedLat = (upperLat + lowerLat) / 2;
+            const calculatedLon = (upperLng + lowerLng) / 2;
 
-          setCenterLat(calculatedLat);
-          setCenterLon(calculatedLon);
+            setCenterLat(calculatedLat);
+            setCenterLon(calculatedLon);
+          }
         }
       } catch (error) {
         console.error('Error fetching project data:', error);

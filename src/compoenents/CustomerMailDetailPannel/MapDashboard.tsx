@@ -49,28 +49,35 @@ const MapDashboard: React.FC = () => {
       try {
         const response = await fetch(`${API_BASE_URL}/project/${id}`);
         const data = await response.json();
-        const mapImagePngUrl = data?.taskList?.[0]?.mapImagePngUrl;
 
-        // console.log('map API - '+mapImagePngUrl)
+        // Specify the taskType you want to target (e.g., "RGB")
+        const desiredTaskType = "RGB";
 
-        const upperLat = parseFloat(data?.taskList?.[0]?.upperLat);
-        const lowerLat = parseFloat(data?.taskList?.[0]?.lowerLat);
-        const upperLng = parseFloat(data?.taskList?.[0]?.upperLng);
-        const lowerLng = parseFloat(data?.taskList?.[0]?.lowerLng);
+        // Find the task object with the desired taskType
+        const task = data?.taskList?.find((t: any) => t.taskType === desiredTaskType);
 
-        if (mapImagePngUrl) {
-          setMapImageUrl(mapImagePngUrl);
+        if (task) {
+          const { mapImagePngUrl, upperLat, lowerLat, upperLng, lowerLng } = task;
+
+          // Set the map image URL if it exists
+          if (mapImagePngUrl) {
+            setMapImageUrl(mapImagePngUrl);
+          }
+
+          // Set geo-coordinates if they all exist
+          if (upperLat && lowerLat && upperLng && lowerLng) {
+            setGeoCoordinates({
+              upperLat: parseFloat(upperLat),
+              lowerLat: parseFloat(lowerLat),
+              upperLng: parseFloat(upperLng),
+              lowerLng: parseFloat(lowerLng),
+            });
+          }
         }
 
-        if (upperLat && lowerLat && upperLng && lowerLng) {
-          setGeoCoordinates({ upperLat, lowerLat, upperLng, lowerLng });
-        }
         // Store the IoT device list from the response
-
         if (data?.iotDeviceList) {
-
           setIoTDeviceList(data.iotDeviceList);
-
         }
       } catch (error) {
         console.error('Error fetching map data:', error);
