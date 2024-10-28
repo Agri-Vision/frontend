@@ -12,11 +12,13 @@ const AdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true); // State to show loading status
     const [error, setError] = useState<string | null>(null); // State to show error messages
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     useEffect(() => {
         // Fetch the projects from the API
         const fetchProjects = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/project');
+                const response = await axios.get(`${API_BASE_URL}/project`);
                 setProjects(response.data); // Update the state with fetched data
             } catch (error) {
                 setError('Failed to fetch projects');
@@ -72,7 +74,7 @@ const AdminDashboard: React.FC = () => {
                     {/* Create Organization Button */}
                     <Button 
                         variant="contained" 
-                        color="secondary" 
+                        color="primary" 
                         sx={{ marginLeft: 2, marginBottom: 2 }}
                         onClick={() => navigate('create-organization')} 
                     >
