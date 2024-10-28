@@ -3,6 +3,7 @@ import { Box, Typography, IconButton, Grid, Card, CardContent, CardMedia, Button
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useNavigate } from 'react-router-dom';
+import { log } from 'console';
 
 interface ProjectSectionProps {
     title: string;
@@ -18,6 +19,10 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects }) => {
     useEffect(() => {
         if (projects.length > 0) {
             setLoading(false);
+            console.log(loading);
+            console.log(projects);
+            
+        
         }
     }, [projects]);
 

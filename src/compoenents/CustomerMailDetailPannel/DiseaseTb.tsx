@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
+import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface IoTData {
   rowCol: string;
@@ -19,6 +20,8 @@ const DiseaseTb: React.FC = () => {
   const [data, setData] = useState<IoTData[]>([]);
   const [selectedData, setSelectedData] = useState<IoTData | null>(null);
   const [showModal, setShowModal] = useState(false);
+
+  const { highlightedBlock, highlightBlock, removeHighlight } = useMapHighlightContext();
 
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (tileId: number) => `${API_BASE_URL}/prediction/disease/health-score/${tileId}`;
@@ -97,17 +100,73 @@ const DiseaseTb: React.FC = () => {
     fetchTileData();
   }, []);
 
-  const handleRowClick = (rowData: IoTData) => {
+  const handleViewClick = (rowData: IoTData) => {
     setSelectedData(rowData);
     setShowModal(true);
   };
 
+  const handleLocateClick = (rowData: IoTData) => {
+    if (highlightedBlock === rowData.rowCol) {
+      console.log("Unlocating Block ID:", rowData.rowCol);
+      removeHighlight();
+    } else {
+      console.log("Locating Block ID:", rowData.rowCol);
+      highlightBlock(rowData.rowCol);
+    }
+  };
   const columns = [
     { label: 'Block ID ', key: 'rowCol' },
     { label: 'Temperature (℃)', key: 'temperature' },
     { label: 'Humidity (%)', key: 'humidity' },
     { label: 'UV Level', key: 'uvLevel' },
     { label: 'Disease Vulnerability', key: 'diseaseVulnerability' },
+    {
+      label: 'Locate',
+      key: 'locate',
+      render: (rowData: IoTData) => (
+        <Button 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering row click
+            handleLocateClick(rowData);
+          }} 
+          variant="contained" 
+          color={highlightedBlock === rowData.rowCol ? "error" : "primary"}
+          sx={{
+            backgroundColor: highlightedBlock === rowData.rowCol ? 'rgba(6,26,41,255)' : undefined,
+            '&:hover': {
+              backgroundColor: highlightedBlock === rowData.rowCol ? 'primary' : undefined,
+            },
+            fontFamily: 'Nunito, Poppins, sans-serif',
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            minWidth: '80px',
+            height: '32px'
+          }}
+        >
+          {highlightedBlock === rowData.rowCol ? 'Unlocate' : 'Locate'}
+        </Button>
+      )
+    },
+    {
+      label: 'View',
+      key: 'view',
+      render: (rowData: TileData) => (
+        <Button onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering row click
+          handleViewClick(rowData);
+        }} 
+        sx={{
+          fontFamily: 'Nunito, Poppins, sans-serif',
+          padding: '4px 8px',
+          fontSize: '0.85rem',
+          minWidth: '80px',
+          height: '32px'
+        }}
+        variant="contained" color="primary">
+          View
+        </Button>
+      )
+    }
   ];
 
   return (
@@ -133,7 +192,7 @@ const DiseaseTb: React.FC = () => {
         </Box>
       </Box>
 
-      <ReusableTable columns={columns} data={data} onRowClick={handleRowClick} recordsPerPage={5} />
+      <ReusableTable columns={columns} data={data} onRowClick={handleViewClick} recordsPerPage={5} />
 
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{
         style: {

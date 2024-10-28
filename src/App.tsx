@@ -6,11 +6,13 @@ import { AppTheme } from "./assets/styles/Themes/CustomAppTheme";
 import { IoTProvider } from '../src/compoenents/IoTContext'; 
 import { ButtonProvider } from '../src/compoenents/ButtonContext';
 import { MapTypeProvider } from './compoenents/MapTypeContext'; 
+import { MapHighlightProvider } from './compoenents/MapHighlightContext';
 
 function App() {
   return (
     <ThemeProvider theme={AppTheme}>
       <Box className="App">
+      <MapHighlightProvider> 
         <ButtonProvider>  
           <IoTProvider>  
             <MapTypeProvider>  
@@ -20,6 +22,7 @@ function App() {
             </MapTypeProvider>
           </IoTProvider>
         </ButtonProvider>  
+        </MapHighlightProvider>
       </Box>
     </ThemeProvider>
   );

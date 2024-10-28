@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
+import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface TileData {
   rowCol: string;
@@ -21,7 +22,18 @@ const StressTb: React.FC = () => {
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (tileId: number) => `${API_BASE_URL}/prediction/stress/${tileId}`;
 
+  const { highlightedBlock, highlightBlock, removeHighlight } = useMapHighlightContext(); // Access the highlight function from context
   
+  const handleLocateClick = (rowData: TileData) => {
+    if (highlightedBlock === rowData.rowCol) {
+      console.log("Unlocating Block ID:", rowData.rowCol);
+      removeHighlight();
+    } else {
+      console.log("Locating Block ID:", rowData.rowCol);
+      highlightBlock(rowData.rowCol);
+    }
+  };
+
   // Fetch Water Stress information using tile ID
   const fetchWaterStress = async (tileId: number) => {
     try {
@@ -95,10 +107,14 @@ const fetchTileData = async () => {
     fetchTileData();
   }, []);
 
-  const handleRowClick = (rowData: TileData) => {
+  
+
+
+  const handleViewClick = (rowData: TileData) => {
     setSelectedData(rowData);
     setShowModal(true);
   };
+
 
   // Define table columns
   const columns = [
@@ -106,6 +122,53 @@ const fetchTileData = async () => {
     { label: 'Stress Status', key: 'stressStatus' },
     { label: 'Water Stress or Not', key: 'waterStress' },
     { label: 'Action for Average', key: 'actionForAverage' },
+    {
+      label: 'Locate',
+      key: 'locate',
+      render: (rowData: TileData) => (
+        <Button 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering row click
+            handleLocateClick(rowData);
+          }} 
+          variant="contained" 
+          color={highlightedBlock === rowData.rowCol ? "error" : "primary"}
+          sx={{
+            backgroundColor: highlightedBlock === rowData.rowCol ? 'rgba(6,26,41,255)' : undefined,
+            '&:hover': {
+              backgroundColor: highlightedBlock === rowData.rowCol ? 'primary' : undefined,
+            },
+            fontFamily: 'Nunito, Poppins, sans-serif',
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            minWidth: '90px',
+            height: '32px'
+          }}
+        >
+          {highlightedBlock === rowData.rowCol ? 'Unlocate' : 'Locate'}
+        </Button>
+      )
+    },
+    {
+      label: 'View',
+      key: 'view',
+      render: (rowData: TileData) => (
+        <Button onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering row click
+          handleViewClick(rowData);
+        }} 
+        sx={{
+          fontFamily: 'Nunito, Poppins, sans-serif',
+          padding: '4px 8px',
+          fontSize: '0.85rem',
+          minWidth: '80px',
+          height: '32px'
+        }}
+        variant="contained" color="primary">
+          View
+        </Button>
+      )
+    }
   ];
 
   return (
@@ -131,7 +194,7 @@ const fetchTileData = async () => {
       <ReusableTable 
         columns={columns} 
         data={data} 
-        onRowClick={handleRowClick} 
+        onRowClick={handleViewClick} 
         recordsPerPage={5} 
       />
 
