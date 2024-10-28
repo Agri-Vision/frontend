@@ -25,8 +25,6 @@ const Statistics: React.FC = () => {
                 const newEstates = data.filter((item: any) => item.status === 'NEW').length;
                 const completedEstates = data.filter((item: any) => item.status === 'COMPLETED').length;
 
-              
-
                 // Update metrics with API data
                 setMetrics({
                     coveredArea: {
@@ -55,11 +53,12 @@ const Statistics: React.FC = () => {
     }, [id, API_BASE_URL]);
 
     return (
+
         <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
+        <Grid container spacing={2}>
                 {/* Total Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px',  width: '220px', height: '100px' }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' , width: '90%', height: '80px'}}>
                         <Avatar sx={{ bgcolor: metrics.coveredArea.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
@@ -76,7 +75,7 @@ const Statistics: React.FC = () => {
 
                 {/* New Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px',  width: '220px', height: '100px'  }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px', width: '90%', height: '80px' }}>
                         <Avatar sx={{ bgcolor: metrics.estimatedYield.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
@@ -93,7 +92,7 @@ const Statistics: React.FC = () => {
 
                 {/* Pending Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' ,  width: '220px', height: '100px' }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px', width: '90%', height: '80px' }}>
                         <Avatar sx={{ bgcolor: metrics.IOTDevices.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
@@ -110,7 +109,7 @@ const Statistics: React.FC = () => {
 
                 {/* Completed Estates Card */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' ,  width: '220px', height: '100px' }}>
+                    <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px', width: '90%', height: '80px' }}>
                         <Avatar sx={{ bgcolor: metrics.validPeriod.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
