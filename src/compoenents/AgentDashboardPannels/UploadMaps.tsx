@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Grid, Paper, IconButton, Alert } from '@mui/material';
+import { Box, Typography, Button, Grid, Paper, IconButton, Alert, CircularProgress } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -31,6 +31,7 @@ const UploadMaps: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -79,6 +80,7 @@ const UploadMaps: React.FC = () => {
   };
 
   const handleUpload = async () => {
+    setUploading(true);
     const formData = new FormData();
     Object.keys(mapFiles).forEach((mapType) => {
       const file = mapFiles[mapType];
@@ -94,6 +96,8 @@ const UploadMaps: React.FC = () => {
     } catch (error) {
       console.error('Error uploading maps:', error);
       setMessage({ type: 'error', text: 'Failed to upload maps. Please try again.' });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -108,28 +112,30 @@ const UploadMaps: React.FC = () => {
   const { webOdmProjectId, taskList, agent } = projectDetails;
 
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box sx={{ padding: 4, backgroundColor: '#f4f5f7', borderRadius: '8px', maxWidth: '1300px', margin: 'auto' }}>
+      <Typography variant="h4" gutterBottom sx={{ color: '#37474f', fontWeight: 700 }}>
         Upload Maps for Project: {projectDetails.projectName}
       </Typography>
-      <Typography variant="body1" gutterBottom>
-        WebODM Project ID: <strong>{webOdmProjectId || 'Not Available'}</strong>
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        Project Status: <strong>{projectDetails.status}</strong>
-      </Typography>
-      {agent ? (
-        <Typography variant="body1" gutterBottom>
-          Assigned to: <strong>{agent.firstName} {agent.lastName}</strong>
+      <Box sx={{ marginBottom: 2 }}>
+        <Typography variant="body1">
+          <strong>WebODM Project ID:</strong> {webOdmProjectId || 'Not Available'}
         </Typography>
-      ) : (
-        <Typography variant="body1" color="error" gutterBottom>
-          Agent information is not available.
+        <Typography variant="body1">
+          <strong>Project Status:</strong> {projectDetails.status}
         </Typography>
-      )}
+        {agent ? (
+          <Typography variant="body1">
+            <strong>Assigned to:</strong> {agent.firstName} {agent.lastName}
+          </Typography>
+        ) : (
+          <Typography variant="body1" color="error">
+            Agent information is not available.
+          </Typography>
+        )}
+      </Box>
 
       {message && (
-        <Alert severity={message.type} sx={{ mt: 2 }}>
+        <Alert severity={message.type} sx={{ mt: 2, borderRadius: 1 }}>
           {message.text}
         </Alert>
       )}
@@ -146,14 +152,12 @@ const UploadMaps: React.FC = () => {
                 padding: 3,
                 display: 'flex',
                 flexDirection: 'column',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                 borderRadius: '10px',
                 transition: 'transform 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                },
+                '&:hover': { transform: 'translateY(-5px)' },
               }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#37474f' }}>
                   {task.taskType} Task ID: {task.webOdmTaskId}
                 </Typography>
                 {task.lastModifiedDate && (
@@ -163,7 +167,7 @@ const UploadMaps: React.FC = () => {
                 )}
 
                 {uploadedPreviews[`${task.taskType.toLowerCase()}Map`] ? (
-                  <Box sx={{ position: 'relative', marginTop: 2, height: '200px', borderRadius: '8px', overflow: 'hidden' }}>
+                  <Box sx={{ position: 'relative', marginTop: 2, height: '200px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)' }}>
                     <img
                       src={uploadedPreviews[`${task.taskType.toLowerCase()}Map`] || ''}
                       alt={`${task.taskType} preview`}
@@ -190,6 +194,7 @@ const UploadMaps: React.FC = () => {
                 <Button
                   variant="contained"
                   component="label"
+                  color="primary"
                   sx={{ marginTop: 2, borderRadius: '8px', padding: '10px' }}
                 >
                   Upload {task.taskType} Map
@@ -209,10 +214,10 @@ const UploadMaps: React.FC = () => {
         variant="contained"
         color="primary"
         onClick={handleUpload}
-        sx={{ marginTop: 3, width: '100%', padding: '12px', borderRadius: '8px' }}
-        disabled={!taskList || taskList.length === 0}
+        sx={{ marginTop: 3, width: '100%', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}
+        disabled={uploading || !taskList || taskList.length === 0}
       >
-        Upload All Maps
+        {uploading ? <CircularProgress size={24} color="inherit" /> : 'Upload All Maps'}
       </Button>
     </Box>
   );
