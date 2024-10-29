@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Button, Grid, Paper, Checkbox, FormControlLabel, IconButton } from '@mui/material';
+import { Box, Typography, TextField, Button, Grid, Paper, Checkbox, FormControlLabel, IconButton, CircularProgress} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -20,6 +20,7 @@ const ProjectDetail: React.FC = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [webOdmProjectId, setWebOdmProjectId] = useState<string>('');
   const [taskList, setTaskList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const WEBODM_URL = import.meta.env.VITE_WEBODM_URL;
@@ -127,6 +128,7 @@ const ProjectDetail: React.FC = () => {
 console.log("webodm link:",WEBODM_URL );
 
     try {
+      setLoading(true); // Start loading
       // Obtain Authorization Token
       const tokenResponse = await axios.post(`${WEBODM_URL}/api/token-auth/`, {
         username: 'DinukaKariyawasam',
@@ -208,6 +210,8 @@ console.log("webodm link:",WEBODM_URL );
     } catch (error: any) {
       console.error('Error creating project or tasks:', error.message);
       setMessage({ type: 'error', text: 'Failed to create project or tasks. Please try again.' });
+    }finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -224,12 +228,15 @@ const handleUpdateProject = async (newWebOdmProjectId: string, createdTasks: any
   };
 
   try {
+    setLoading(true); // Start loading
     const response = await axios.put(`${API_BASE_URL}/project`, updateData);
     console.log('Project updated:', response.data);
     setMessage({ type: 'success', text: 'Project updated successfully!' });
   } catch (error) {
     console.error('Error updating project:', error);
     setMessage({ type: 'error', text: 'Failed to update project. Please try again.' });
+  }finally {
+    setLoading(false); // End loading
   }
 };
 
@@ -366,7 +373,7 @@ return (
               sx={{ marginBottom: 2 }}
             />
             <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!isConfirmed} sx={{ width: '100%', padding: '12px' }}>
-              Submit
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
             </Button>
           </Grid>
         </Grid>
