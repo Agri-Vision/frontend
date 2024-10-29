@@ -125,14 +125,14 @@ const ProjectDetail: React.FC = () => {
     }
 
     try {
-      // Step 1: Obtain Authorization Token
+      // Obtain Authorization Token
       const tokenResponse = await axios.post(`${WEBODM_URL}/api/token-auth/`, {
         username: 'DinukaKariyawasam',
         password: 'test'
       });
       const token = tokenResponse.data.token;
 
-      // Step 2: Create a New Project in WebODM
+      // Create a New Project in WebODM
       const projectResponse = await axios.post(`${WEBODM_URL}/api/projects/`, {
         name: projectDetails.projectName
       }, {
@@ -143,10 +143,10 @@ const ProjectDetail: React.FC = () => {
       const newWebOdmProjectId = projectResponse.data.id;
       setWebOdmProjectId(newWebOdmProjectId);
 
-      // Step 3: Categorize Images by Bands
+      // Categorize Images by Bands
       const categorizedImages = categorizeImages(uploadedImages);
 
-      // Step 4: Create Tasks for Each Band of Images
+      // Create Tasks for Each Band of Images
       const createdTasks: any[] = [];
 
       const createTaskForBand = async (bandName: string, images: File[]) => {
@@ -202,22 +202,23 @@ const ProjectDetail: React.FC = () => {
       setMessage({ type: 'success', text: 'Project and tasks created successfully!' });
 
       // Automatically update the project after successful submission
-    await handleUpdateProject();
+      await handleUpdateProject(newWebOdmProjectId, createdTasks);
     } catch (error: any) {
       console.error('Error creating project or tasks:', error.message);
       setMessage({ type: 'error', text: 'Failed to create project or tasks. Please try again.' });
     }
   };
 
-  const handleUpdateProject = async () => {
+  // Updated handleUpdateProject to accept parameters
+const handleUpdateProject = async (newWebOdmProjectId: string, createdTasks: any[]) => {
   const updateData = {
     ...projectDetails,
-    webOdmProjectId,
+    webOdmProjectId: newWebOdmProjectId,
     iotDeviceList: iotDevices.map((device) => ({
       ...device,
       deviceCode: `IOT-SENSOR-${device.id}`
     })),
-    taskList: taskList
+    taskList: createdTasks
   };
 
   try {
