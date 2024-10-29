@@ -18,10 +18,10 @@ interface Metric {
 const DashboardMetrics: React.FC = () => {
     // State to store the values of metrics fetched from an API
     const [metrics, setMetrics] = useState({
-        totalUser: { value: '40', change: '1% Up from past month', positive: true },
-        totalProjects: { value: '10', change: '1% Up from past month', positive: true },
-        updatedProjects: { value: '14', change: '4% Down from past month', positive: false },
-        totalPending: { value: '20', change: '1% Up from past month', positive: true },
+        totalUser: { value: '2', change: '100% Up from past month', positive: true },
+        totalProjects: { value: '10', change: '25% Up from past month', positive: true },
+        updatedProjects: { value: '14', change: '20% Down from past month', positive: false },
+        totalPending: { value: '20', change: '40% Up from past month', positive: true },
     });
 
     // Optionally, fetch data from an API to update values
@@ -57,7 +57,7 @@ const DashboardMetrics: React.FC = () => {
                                 fontFamily: 'Nunito, Poppins, sans-serif',
                                 fontSize: '16px',
                                 color: '#5D6965',
-                            }} variant="h6">Total Users</Typography>
+                            }} variant="h6">Total Plantations</Typography>
                             <Typography variant="h4" sx={{
                                 fontFamily: 'Poppins, sans-serif',
                                 fontSize: '28px',

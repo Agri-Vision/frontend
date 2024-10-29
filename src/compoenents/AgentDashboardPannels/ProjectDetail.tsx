@@ -3,6 +3,7 @@ import { Box, Typography, TextField, Button, Grid, Paper, Checkbox, FormControlL
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { log } from 'console';
 
 interface IoTDevice {
   id: string;
@@ -123,6 +124,7 @@ const ProjectDetail: React.FC = () => {
       setMessage({ type: 'error', text: 'Please confirm the details before submitting.' });
       return;
     }
+console.log("webodm link:",WEBODM_URL );
 
     try {
       // Obtain Authorization Token

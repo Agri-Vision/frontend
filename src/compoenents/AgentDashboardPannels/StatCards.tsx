@@ -20,7 +20,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change }) => {
 const StatCards: React.FC = () => {
   return (
     <div className="stats-container">
-      <StatCard title="Total User" value="40,689" change="+8.5% Up from yesterday" />
+      <StatCard title="Total Plantations" value="2" change="+8.5% Up from yesterday" />
       <StatCard title="Total Projects" value="10,293" change="+1.3% Up from past week" />
       <StatCard title="Updated Projects" value="89,000" change="-4.3% Down from yesterday" />
       <StatCard title="Total Pending" value="2,040" change="+1.8% Up from yesterday" />
