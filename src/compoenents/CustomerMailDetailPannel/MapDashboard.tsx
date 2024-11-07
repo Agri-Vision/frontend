@@ -37,6 +37,7 @@ const MapDashboard: React.FC = () => {
   const [numRows, setNumRows] = useState(0);
   const [numCols, setNumCols] = useState(0);
 
+  
   // Fetch data from the API when the component mounts
   useEffect(() => {
     const fetchData = async () => {
@@ -45,7 +46,7 @@ const MapDashboard: React.FC = () => {
         const data = await response.json();
         const mapImagePngUrl = data?.taskList?.[0]?.mapImagePngUrl;
 
-        console.log('map API'+mapImagePngUrl)
+        console.log('map API - '+mapImagePngUrl)
 
         const upperLat = parseFloat(data?.taskList?.[0]?.upperLat);
         const lowerLat = parseFloat(data?.taskList?.[0]?.lowerLat);
@@ -334,8 +335,8 @@ const MapDashboard: React.FC = () => {
                   block.textContent = ''; // Clear the text content
                 };
                 block.onclick = () => {
-                  const centerLat = lowerLat + ((upperLat - lowerLat) * (i + 0.5)) / numRows;
-                  const centerLng = lowerLng + ((upperLng - lowerLng) * (j + 0.5)) / numCols;
+                  const centerLat = lowerLat + ((upperLat - lowerLat) * (i )) / numRows;
+                  const centerLng = lowerLng + ((upperLng - lowerLng) * (j )) / numCols;
 
                   const infoWindow = new window.google.maps.InfoWindow({
                     content: `<div>
