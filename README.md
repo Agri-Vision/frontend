@@ -1,3 +1,34 @@
+# AgriVision
+
+<div style="text-align: justify;">  AgriVision offers an all-in-one solution for plantation owners and managers, combining advanced drone imaging, IoT data, and AI-driven insights. Optimize your resources, increase productivity, and boost profitability with real-time field analytics tailored for precision agriculture. Empower your business with AgriVision's cutting-edge technology to stay ahead in the competitive agricultural industry. </div>
+
+Our Team:
+
+Mr.Vishan Jayasinghearachchi (Supervisor)\
+Dr.Kapila Dissanayaka (Co-Supervisor)
+
+Members:\
+[Dinuka Kariyawasam](https://www.linkedin.com/in/dinuka-kariyawasam-46248725b/) \
+[Prathila Kahandagamge](https://www.linkedin.com/in/prathila-kahandagamage-70a495b3/)\
+[Joel Milendra](https://www.linkedin.com/in/joel-milendra-055761247/)\
+[Rivindu Fernando](https://www.linkedin.com/in/rivindu-fernando-516825246/)
+
+Web Link: https://agri-vision.github.io/AgriVision
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
