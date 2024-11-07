@@ -1,39 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, IconButton, Grid, Card, CardContent, CardMedia, Button } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useNavigate } from 'react-router-dom';
-
-interface Project {
-    id: string;
-    estateName: string;
-    title: string;
-    date: string;
-    imageUrl: string;
-}
+import { log } from 'console';
 
 interface ProjectSectionProps {
     title: string;
-    apiEndpoint: string;
-    initialData: Project[];
+    projects: any[];
 }
 
-const ProjectSection: React.FC<ProjectSectionProps> = ({ title, apiEndpoint, initialData }) => {
+const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects }) => {
     const navigate = useNavigate();
-
-    const [projects, setProjects] = useState<Project[]>(initialData);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const projectsToShow = 3; // Number of projects visible at a time
+    const projectsToShow = 4; // Number of projects visible at a time
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Optionally, fetch data from API to update the projects
-        /*
-        fetch(apiEndpoint)
-            .then(response => response.json())
-            .then(data => setProjects(data.projects))
-            .catch(error => console.error('Error fetching projects:', error));
-        */
-    }, [apiEndpoint]);
+        if (projects.length > 0) {
+            setLoading(false);
+            console.log(loading);
+            console.log(projects);
+            
+        
+        }
+    }, [projects]);
 
     const handleNextSlide = () => {
         if (currentIndex < projects.length - projectsToShow) {
@@ -51,81 +42,116 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ title, apiEndpoint, ini
         navigate(`project/${projectId}`);
     };
 
+    const handleUploadMapsClick = (projectId: string) => {
+        navigate(`/home/agent-dashboard/upload-map/${projectId}`);
+    };
+
     return (
-        <Box sx={{ marginTop: 4, width: '100%' }}>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+        <Box sx={{ marginTop: 4 }}>
+            <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 'bold' }}>
                 {title}
             </Typography>
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <IconButton onClick={handlePrevSlide} disabled={currentIndex === 0}>
-                    <ArrowBackIosIcon />
-                </IconButton>
-                <div
-                    style={{
-                        display: 'flex',
-                        overflow: 'hidden',
-                        width: 'calc(100% - 96px)', // Adjust width to account for arrow buttons
-                        height: '350px', // Adjusted height for the card container
-                        position: 'relative',
-                        justifyContent: 'center', // Center items horizontally
-                        alignItems: 'center', // Center items vertically
-                    }}
-                >
-                    {projects.length === 0 ? (
-                        <Typography variant="body1" color="textSecondary" style={{ textAlign: 'center' }}>
-                            No current assignments.
-                        </Typography>
-                    ) : (
-                        <div
-                            style={{
-                                display: 'flex',
-                                transition: 'transform 0.5s ease-in-out',
-                                transform: `translateX(-${currentIndex * (100 / projectsToShow)}%)`,
-                                width: `${(projects.length * 100) / projectsToShow}%`, // Dynamic width for the slider
-                            }}
-                        >
-                            {projects.map((project) => (
-                                <div
-                                    key={project.id}
-                                    onClick={() => handleCardClick(project.id)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        flex: '0 0 30%', // Adjust width for 3 cards
-                                        maxWidth: '30%', // Ensure that it does not grow larger than 30%
-                                        height: '300px', // Increased height to better match the Figma design
-                                        margin: '0 15px',
-                                        boxSizing: 'border-box',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '8px',
-                                        overflow: 'hidden',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'space-between',
-                                    }}
-                                >
-                                    <img
-                                        src={project.imageUrl}
-                                        alt={project.estateName}
-                                        style={{ width: '100%', height: '150px', objectFit: 'cover' }}
-                                    />
-                                    <div style={{ padding: '10px' }}>
-                                        <Typography variant="body2" color="textSecondary" gutterBottom>
-                                            {project.date}
-                                        </Typography>
-                                        <Typography variant="h6">{project.estateName}</Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {project.title}
-                                        </Typography>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                <IconButton onClick={handleNextSlide} disabled={currentIndex >= projects.length - projectsToShow}>
-                    <ArrowForwardIosIcon />
-                </IconButton>
-            </div>
+            {loading ? (
+                <Typography variant="body1" color="textSecondary">
+                    Loading projects...
+                </Typography>
+            ) : (
+                <Box display="flex" alignItems="center">
+                    <IconButton onClick={handlePrevSlide} disabled={currentIndex === 0}>
+                        <ArrowBackIosIcon />
+                    </IconButton>
+                    <Box sx={{ width: '100%', overflow: 'hidden' }}>
+                        {projects.length === 0 ? (
+                            <Typography variant="body1" color="textSecondary">
+                                No current assignments.
+                            </Typography>
+                        ) : (
+                            <Grid
+                                container
+                                spacing={3}
+                                sx={{
+                                    transition: 'transform 0.5s ease-in-out',
+                                    transform: `translateX(-${currentIndex * (100 / projectsToShow)}%)`,
+                                }}
+                            >
+                                {projects.map((project) => (
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        sm={6}
+                                        md={4}
+                                        key={project.id}
+                                        onClick={() => handleCardClick(project.id)}
+                                        sx={{ maxWidth: '480px' }}
+                                    >
+                                        <Card
+                                            sx={{
+                                                width: '100%',
+                                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                                borderRadius: '12px',
+                                                transition: 'transform 0.3s ease',
+                                                '&:hover': {
+                                                    transform: 'translateY(-8px)',
+                                                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+                                                },
+                                            }}
+                                        >
+                                            {project.plantation?.plantationImgUrl && (
+                                                <CardMedia
+                                                    component="img"
+                                                    height="180"
+                                                    image={project.plantation.plantationImgUrl}
+                                                    alt={project.plantation.plantationName}
+                                                    sx={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px', objectFit: 'cover' }}
+                                                />
+                                            )}
+                                            <CardContent sx={{ padding: 2 }}>
+                                                <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                                                    {project.plantation?.plantationName}
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 1 }}>
+                                                    {project.projectName}
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 1 }}>
+                                                    Agent: {project.agent?.firstName} {project.agent?.lastName}
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 1 }}>
+                                                    Status: <span style={{ fontWeight: 'bold' }}>{project.status}</span>
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 1 }}>
+                                                    Assigned on: {new Date(project.createdDate).toLocaleString()}
+                                                </Typography>
+                                                {project.status === 'PENDING' && (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        sx={{
+                                                            width: '100%',
+                                                            marginTop: 2,
+                                                            borderRadius: '8px',
+                                                            padding: '10px 0',
+                                                            textTransform: 'none',
+                                                        }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleUploadMapsClick(project.id);
+                                                        }}
+                                                    >
+                                                        Upload Maps
+                                                    </Button>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        )}
+                    </Box>
+                    <IconButton onClick={handleNextSlide} disabled={currentIndex >= projects.length - projectsToShow}>
+                        <ArrowForwardIosIcon />
+                    </IconButton>
+                </Box>
+            )}
         </Box>
     );
 };

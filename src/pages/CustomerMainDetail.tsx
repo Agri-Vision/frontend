@@ -10,6 +10,7 @@ import { useButtonContext } from '../compoenents/ButtonContext'; // Import the B
 import YeildTb from "../compoenents/CustomerMailDetailPannel/YeildTb";
 import StressTb from "../compoenents/CustomerMailDetailPannel/StressTb";
 import DiseaseTb from "../compoenents/CustomerMailDetailPannel/DiseaseTb";
+import DataHistoryChart from "../compoenents/CustomerMailDetailPannel/Charts/DataHistoryChart";
 
 const CustomerMainDetail = () => {
   const { isYieldActive, isStressActive, isDiseaseActive } = useButtonContext(); // Get the states from context
@@ -53,6 +54,10 @@ const CustomerMainDetail = () => {
           <IoTHistoryTb />
         </div>
       )}
+
+      <div className="iot-History-Table"><DataHistoryChart /></div>
+
+
     </div>
   );
 };

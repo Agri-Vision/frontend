@@ -18,10 +18,10 @@ interface Metric {
 const DashboardMetrics: React.FC = () => {
     // State to store the values of metrics fetched from an API
     const [metrics, setMetrics] = useState({
-        totalUser: { value: '40,689', change: '8.5% Up from yesterday', positive: true },
-        totalProjects: { value: '10,293', change: '1.3% Up from past week', positive: true },
-        updatedProjects: { value: '89,000', change: '4.3% Down from yesterday', positive: false },
-        totalPending: { value: '2,040', change: '1.8% Up from yesterday', positive: true },
+        totalUser: { value: '2', change: '100% Up from past month', positive: true },
+        totalProjects: { value: '10', change: '25% Up from past month', positive: true },
+        updatedProjects: { value: '14', change: '20% Down from past month', positive: false },
+        totalPending: { value: '20', change: '40% Up from past month', positive: true },
     });
 
     // Optionally, fetch data from an API to update values
@@ -48,13 +48,23 @@ const DashboardMetrics: React.FC = () => {
             <Grid container spacing={2}>
                 {/* Static Card for Total Users */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: metrics.totalUser.positive ? 'success.light' : 'error.light' }}>
+                    <Paper elevation={3} sx={{ padding: 2, textAlign: 'flex', display: 'flex', alignItems: 'center', gap: 2 , borderRadius: '16px'}}>
+                        <Avatar sx={{ bgcolor: metrics.totalUser.positive ? 'success.light' : 'error.light',marginRight: 1 }}>
                             <PeopleIcon />
                         </Avatar>
                         <Box>
-                            <Typography variant="h6">Total User</Typography>
-                            <Typography variant="h4" sx={{ marginTop: 1 }}>{metrics.totalUser.value}</Typography>
+                        <Typography sx={{
+                                fontFamily: 'Nunito, Poppins, sans-serif',
+                                fontSize: '16px',
+                                color: '#5D6965',
+                            }} variant="h6">Total Plantations</Typography>
+                            <Typography variant="h4" sx={{
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '28px',
+                                fontWeight: 'bold',
+                                color: '#5D6965',
+                                display: 'inline-block'
+                            }}>{metrics.totalUser.value}</Typography>
                             <Typography variant="body2" sx={{ color: metrics.totalUser.positive ? 'green' : 'red', marginTop: 1 }}>
                                 {metrics.totalUser.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.totalUser.change}
                             </Typography>
@@ -64,13 +74,23 @@ const DashboardMetrics: React.FC = () => {
 
                 {/* Static Card for Total Projects */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: metrics.totalProjects.positive ? 'success.light' : 'error.light' }}>
-                            <AssignmentIcon />
+                <Paper elevation={3} sx={{ padding: 2, textAlign: 'flex', display: 'flex', alignItems: 'center', gap: 2 , borderRadius: '16px'}}>
+                <Avatar sx={{ bgcolor: metrics.totalProjects.positive ? 'success.light' : 'error.light',marginRight: 1 }}>
+                            <PeopleIcon />
                         </Avatar>
                         <Box>
-                            <Typography variant="h6">Total Projects</Typography>
-                            <Typography variant="h4" sx={{ marginTop: 1 }}>{metrics.totalProjects.value}</Typography>
+                        <Typography sx={{
+                                fontFamily: 'Nunito, Poppins, sans-serif',
+                                fontSize: '16px',
+                                color: '#5D6965',
+                            }} variant="h6">Total Projects</Typography>
+                            <Typography variant="h4" sx={{
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '28px',
+                                fontWeight: 'bold',
+                                color: '#5D6965',
+                                display: 'inline-block'
+                            }}>{metrics.totalProjects.value}</Typography>
                             <Typography variant="body2" sx={{ color: metrics.totalProjects.positive ? 'green' : 'red', marginTop: 1 }}>
                                 {metrics.totalProjects.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.totalProjects.change}
                             </Typography>
@@ -80,13 +100,23 @@ const DashboardMetrics: React.FC = () => {
 
                 {/* Static Card for Updated Projects */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: metrics.updatedProjects.positive ? 'success.light' : 'error.light' }}>
-                            <UpdateIcon />
+                <Paper elevation={3} sx={{ padding: 2, textAlign: 'flex', display: 'flex', alignItems: 'center', gap: 2 , borderRadius: '16px'}}>
+                <Avatar sx={{ bgcolor: metrics.updatedProjects.positive ? 'success.light' : 'error.light',marginRight: 1 }}>
+                            <PeopleIcon />
                         </Avatar>
                         <Box>
-                            <Typography variant="h6">Updated Projects</Typography>
-                            <Typography variant="h4" sx={{ marginTop: 1 }}>{metrics.updatedProjects.value}</Typography>
+                        <Typography sx={{
+                                fontFamily: 'Nunito, Poppins, sans-serif',
+                                fontSize: '16px',
+                                color: '#5D6965',
+                            }} variant="h6">Updated Projects</Typography>
+                            <Typography variant="h4" sx={{
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '28px',
+                                fontWeight: 'bold',
+                                color: '#5D6965',
+                                display: 'inline-block'
+                            }}>{metrics.updatedProjects.value}</Typography>
                             <Typography variant="body2" sx={{ color: metrics.updatedProjects.positive ? 'green' : 'red', marginTop: 1 }}>
                                 {metrics.updatedProjects.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.updatedProjects.change}
                             </Typography>
@@ -96,13 +126,23 @@ const DashboardMetrics: React.FC = () => {
 
                 {/* Static Card for Total Pending */}
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={3} sx={{ padding: 2, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: metrics.totalPending.positive ? 'success.light' : 'error.light' }}>
-                            <PendingActionsIcon />
+                <Paper elevation={3} sx={{ padding: 2, textAlign: 'flex', display: 'flex', alignItems: 'center', gap: 2 , borderRadius: '16px'}}>
+                <Avatar sx={{ bgcolor: metrics.totalPending.positive ? 'success.light' : 'error.light',marginRight: 1 }}>
+                            <PeopleIcon />
                         </Avatar>
                         <Box>
-                            <Typography variant="h6">Total Pending</Typography>
-                            <Typography variant="h4" sx={{ marginTop: 1 }}>{metrics.totalPending.value}</Typography>
+                        <Typography sx={{
+                                fontFamily: 'Nunito, Poppins, sans-serif',
+                                fontSize: '16px',
+                                color: '#5D6965',
+                            }} variant="h6">Total Pending</Typography>
+                            <Typography variant="h4" sx={{
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '28px',
+                                fontWeight: 'bold',
+                                color: '#5D6965',
+                                display: 'inline-block'
+                            }}>{metrics.totalPending.value}</Typography>
                             <Typography variant="body2" sx={{ color: metrics.totalPending.positive ? 'green' : 'red', marginTop: 1 }}>
                                 {metrics.totalPending.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.totalPending.change}
                             </Typography>

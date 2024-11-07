@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import ReusableTable from '../CustomerMailDetailPannel/ReusableTable';
 import { useParams } from 'react-router-dom';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, CircularProgress  } from '@mui/material';
+import { useMapHighlightContext } from '../MapHighlightContext';
 
 interface TileData {
+  altitude: string;
+  soilMoisture: string;
+  pressure: string;
+  uvLevel: string;
+  humidity: string;
+  temperature: string;
+  ndvi: string;
   rowCol: string;
   id: number;
   yieldEstimation: string;
@@ -16,62 +24,156 @@ const YeildTb: React.FC = () => {
   const [data, setData] = useState<TileData[]>([]);
   const [selectedData, setSelectedData] = useState<TileData | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const { highlightedBlock, highlightBlock, removeHighlight } = useMapHighlightContext();
+
+  const handleLocateClick = (rowData: TileData) => {
+    if (highlightedBlock === rowData.id) {
+      console.log("Unlocating Block ID:", rowData.id);
+      removeHighlight();
+    } else {
+      console.log("Locating Block ID:", rowData.id);
+      highlightBlock(rowData.id);
+    }
+  };
 
   const TILE_API_URL = `${API_BASE_URL}/project/tiles/by/project/${id}`;
   const PREDICTION_API_URL = (taskId: number) => `${API_BASE_URL}/prediction/yield/${taskId}/1`;
 
   // Fetch tile data
-  const fetchTileData = async () => {
-    try {
-      const tileResponse = await fetch(TILE_API_URL);
-      if (!tileResponse.ok) {
-        throw new Error('Failed to fetch tiles');
-      }
-      const tiles = await tileResponse.json();
-
-      // For each tile, fetch the possible condition from the prediction API
-      const tileDataWithPrediction = await Promise.all(
-        tiles.map(async (tile: any) => {
-          const predictionResponse = await fetch(PREDICTION_API_URL(tile.id));
-          if (!predictionResponse.ok) {
-            throw new Error(`Failed to fetch prediction for tile ID: ${tile.id}`);
-          }
-          const predictionResult = await predictionResponse.json();
-
-          return {
-            id: tile.rowCol,
-            yieldEstimation: tile.yield, // Yield estimation from API response
-            conditionStatus: predictionResult.result, // Prediction result from second API
-          };
-        })
-      );
-
-      setData(tileDataWithPrediction);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+const fetchTileData = async () => {
+  setLoading(true); 
+  try {
+    const tileResponse = await fetch(TILE_API_URL);
+    if (!tileResponse.ok) {
+      throw new Error('Failed to fetch tiles');
     }
-  };
+    const tiles = await tileResponse.json();
+
+    // Calculate the number of columns dynamically from the tile data if not defined
+    const maxColIndex = Math.max(...tiles.map((tile: any) => parseInt(tile.rowCol.split('_')[1])));
+    const numCols = maxColIndex + 1; // Assuming column indices start at 0
+
+    // For each tile, fetch the possible condition from the prediction API and calculate blockId
+    const tileDataWithPrediction = await Promise.all(
+      tiles.map(async (tile: any) => {
+        const predictionResponse = await fetch(PREDICTION_API_URL(tile.id));
+        if (!predictionResponse.ok) {
+          throw new Error(`Failed to fetch prediction for tile ID: ${tile.id}`);
+        }
+        const predictionResult = await predictionResponse.json();
+
+        // Extract row and column indices from tile.rowCol (format: "row_col")
+        const [rowIndex, colIndex] = tile.rowCol.split('_').map(Number);
+
+        // Calculate the blockId
+        const blockId = rowIndex * numCols + colIndex + 1;
+
+        return {
+          id: `B${blockId}`, // Set blockId as "B{blockId}"
+          yieldEstimation: tile.yield, // Yield estimation from API response
+          conditionStatus: predictionResult.result, // Prediction result from second API
+          ndvi: tile.ndvi,
+          temperature: tile.temperature,
+          humidity: tile.humidity,
+          uvLevel: tile.uvLevel,
+          soilMoisture: tile.soilMoisture,
+          pressure: tile.pressure,
+          altitude: tile.altitude,
+
+        };
+      })
+    );
+
+    setData(tileDataWithPrediction);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  } finally {
+    setLoading(false); // Set loading to false once data is fetched
+  }
+};
+
 
   useEffect(() => {
     fetchTileData();
   }, []);
 
-  const handleRowClick = (rowData: TileData) => {
+  const handleViewClick = (rowData: TileData) => {
     setSelectedData(rowData);
     setShowModal(true);
   };
 
+ 
+
   // Define table columns
   const columns = [
-    { label: 'Tile ID', key: 'id' },
-    { label: 'Yield Estimation', key: 'yieldEstimation' },
+    { label: 'Block ID ', key: 'id' },
+    { label: 'Yield Estimation (Kg)', key: 'yieldEstimation' },
     { label: 'Possible Condition', key: 'conditionStatus' },
+    {
+      label: 'Locate',
+      key: 'locate',
+      render: (rowData: TileData) => (
+        <Button 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering row click
+            handleLocateClick(rowData);
+          }} 
+          variant="contained" 
+          color={highlightedBlock === rowData.id ? "error" : "primary"}
+          sx={{
+            backgroundColor: highlightedBlock === rowData.id ? 'rgba(6,26,41,255)' : undefined,
+            '&:hover': {
+              backgroundColor: highlightedBlock === rowData.id ? 'primary' : undefined,
+            },
+            fontFamily: 'Nunito, Poppins, sans-serif',
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            minWidth: '90px',
+            height: '32px'
+          }}
+        >
+          {highlightedBlock === rowData.id ? 'Unlocate' : 'Locate'}
+        </Button>
+      )
+    },
+    {
+      label: 'View',
+      key: 'view',
+      render: (rowData: TileData) => (
+        <Button onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering row click
+          handleViewClick(rowData);
+        }} 
+        sx={{
+          fontFamily: 'Nunito, Poppins, sans-serif',
+          padding: '4px 8px',
+          fontSize: '0.85rem',
+          minWidth: '80px',
+          height: '32px'
+        }}
+        variant="contained" color="primary">
+          View
+        </Button>
+      )
+    }
   ];
 
   return (
     <div className="history-table-container">
       <h2>Yield Analysis</h2>
-      <ReusableTable columns={columns} data={data} onRowClick={handleRowClick} recordsPerPage={5} />
+
+      {loading ? ( // Display loader if loading is true
+        <Box display="flex" justifyContent="center" alignItems="center" >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <ReusableTable columns={columns} data={data} onRowClick={handleViewClick} recordsPerPage={5} />
+      )}
+
+
+      
 
       {/* MUI Modal for showing Tile data details */}
       <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" PaperProps={{
@@ -83,9 +185,16 @@ const YeildTb: React.FC = () => {
         <DialogContent style={{ backgroundColor: '#F1F8E9' }}>
           {selectedData ? (
             <>
-              <Typography variant="h6" color="textPrimary"><strong>Tile ID:</strong> {selectedData.rowCol}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Block ID :</strong> {selectedData.id}</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Yield Estimation:</strong> {selectedData.yieldEstimation} Kg</Typography>
               <Typography variant="h6" color="textPrimary"><strong>Possible Condition:</strong> {selectedData.conditionStatus}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>NDVI Value:</strong> {selectedData.ndvi}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Temperature:</strong> {selectedData.temperature} ℃</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Humidity:</strong> {selectedData.humidity} %</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>UV Level:</strong> {selectedData.uvLevel}</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Soil Moisture:</strong>{((parseFloat(selectedData.soilMoisture) - 205) * 100 / (580 - 205)).toFixed(1)} %</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Atmo.Pressure:</strong> {selectedData.pressure} Pa</Typography>
+              <Typography variant="h6" color="textPrimary"><strong>Altitude:</strong> {selectedData.altitude} m</Typography>
             </>
           ) : (
             <Typography variant="body1">Loading...</Typography>

@@ -10,11 +10,13 @@ import ProjectsNew from "../compoenents/Home/ProjectsNew";
 const CustomerHome = () => {
  
 return (
-  <div className="grid-container">
-      <CssBaseline />
-      <div className="header"><Statistics /></div>
-      <h2 style={{ textAlign: 'left', fontFamily: 'Nunito, Poppins, sans-serif', marginBottom: '20px' }}>Estates</h2>
-      <div className="header"><Projects /></div>
+  <div >
+    
+      <div ><Statistics /></div>
+      <h2 style={{ textAlign: 'left', fontFamily: 'Nunito, Poppins, sans-serif', marginBottom: '20px' }}>Projects</h2>
+      <div ><ProjectsCompleted /></div>
+
+      {/* <div className="header"><Projects /></div>
 
       <h2 style={{ textAlign: 'left', fontFamily: 'Nunito, Poppins, sans-serif', marginBottom: '10px' }}>New Estates</h2>
       <div className="header"><ProjectsNew /></div>
@@ -23,7 +25,7 @@ return (
       <div className="header"><ProjectsPending /></div>
 
       <h2 style={{ textAlign: 'left', fontFamily: 'Nunito, Poppins, sans-serif', marginBottom: '10px' }}>Completed Estates</h2>
-      <div className="header"><ProjectsCompleted /></div>
+      <div className="header"><ProjectsCompleted /></div> */}
     </div>
 );
 };
