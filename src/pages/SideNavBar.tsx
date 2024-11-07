@@ -20,7 +20,7 @@ const SideNavBar: FunctionComponent<
     {
       icon: <HomeIcon />,
       label: "Home",
-      link: "/home/customer-main-detail"
+      link: "/home/customer-home"
     },
     {
       icon: <GridViewOutlinedIcon />,

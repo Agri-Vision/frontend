@@ -6,6 +6,7 @@ import MapIcon from '@mui/icons-material/Map';
 import SpaIcon from '@mui/icons-material/Spa';
 import PodcastsIcon from '@mui/icons-material/Podcasts';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import { useParams } from 'react-router-dom';
 
 interface Metric {
     title: string;
@@ -16,152 +17,130 @@ interface Metric {
 }
 
 const Statistics: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const [metrics, setMetrics] = useState({
-        totalUser: { value: '1,689', change: '8.5% Up from last Project', positive: true },
-        totalProjects: { value: '10,293', change: '1.3% Up from last Project', positive: true },
-        updatedProjects: { value: '1', change: '1 Device', positive: true },
-        totalPending: { value: '25', change: 'Days Remaining', positive: false },
+        coveredArea: { value: '1,689', change: '8.5% Up from last Project', positive: true },
+        estimatedYield: { value: '10,293', change: '1.3% Up from last Project', positive: true },
+        IOTDevices: { value: '0', change: '0 Device', positive: true },
+        validPeriod: { value: '0', change: 'Days Remaining', positive: false },
     });
 
     useEffect(() => {
-        // Example: Fetch data from an API
-        // Uncomment and replace the URL with your actual API endpoint
-        /*
-        fetch('https://api.example.com/metrics')
-            .then(response => response.json())
-            .then(data => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/project/${id}`);
+                const data = await response.json();
+
+                // Extract the IoT device count
+                const iotDeviceCount = data.iotDeviceList.length;
+
+                // Calculate the remaining days for the valid period (30-day countdown)
+                const createdDate = new Date(data.createdDate);
+                const currentDate = new Date();
+                const diffTime = 30 - Math.floor((currentDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+                
+                // Update metrics with API data
                 setMetrics({
-                    totalUser: { value: data.totalUser, change: data.userChange, positive: data.userPositive },
-                    totalProjects: { value: data.totalProjects, change: data.projectChange, positive: data.projectPositive },
-                    updatedProjects: { value: data.updatedProjects, change: data.updatedChange, positive: data.updatedPositive },
-                    totalPending: { value: data.totalPending, change: data.pendingChange, positive: data.pendingPositive },
+                    coveredArea: { value: '1,689', change: '8.5% Up from last Project', positive: true }, // Example value
+                    estimatedYield: { value: '10,293', change: '1.3% Up from last Project', positive: true }, // Example value
+                    IOTDevices: { 
+                        value: `${iotDeviceCount}`, 
+                        change: `${iotDeviceCount} Device${iotDeviceCount > 1 ? 's' : ''}`, 
+                        positive: iotDeviceCount > 0 
+                    },
+                    validPeriod: { 
+                        value: `${diffTime > 0 ? diffTime : 0}`, 
+                        change: 'Days Remaining', 
+                        positive: diffTime > 28
+                    },
                 });
-            })
-            .catch(error => console.error('Error fetching metrics:', error));
-        */
-    }, []);
+            } catch (error) {
+                console.error('Error fetching project data:', error);
+            }
+        };
+
+        fetchData();
+    }, [id]);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2}>
-               
+                {/* Covered Area Card */}
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
-                        <Avatar sx={{ bgcolor: metrics.totalUser.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
+                        <Avatar sx={{ bgcolor: metrics.coveredArea.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <MapIcon />
                         </Avatar>
                         <Box sx={{ textAlign: 'center', flex: 1 }}>
-                            <Typography variant="h4" sx={{
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '28px',
-                                fontWeight: 'bold',
-                                color: '#5D6965',
-                                display: 'inline-block'
-                            }}>
-                                {metrics.totalUser.value}
+                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
+                                {metrics.coveredArea.value}
                             </Typography>
-                            <Typography sx={{
-                                fontFamily: 'Nunito, Poppins, sans-serif',
-                                fontSize: '16px',
-                                color: '#5D6965',
-                            }} variant="h6">
+                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
                                 Covered Area (m²)
                             </Typography>
-                            <Typography variant="body2" sx={{ color: metrics.totalUser.positive ? 'green' : 'red', marginTop: 1 }}>
-                                {metrics.totalUser.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.totalUser.change}
+                            <Typography variant="body2" sx={{ color: metrics.coveredArea.positive ? 'green' : 'red', marginTop: 1 }}>
+                                {metrics.coveredArea.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.coveredArea.change}
                             </Typography>
                         </Box>
                     </Paper>
                 </Grid>
 
-              
+                {/* Estimated Yield Card */}
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
-                        <Avatar sx={{ bgcolor: metrics.totalProjects.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
+                        <Avatar sx={{ bgcolor: metrics.estimatedYield.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <SpaIcon />
                         </Avatar>
                         <Box sx={{ textAlign: 'center', flex: 1 }}>
-                            <Typography variant="h4" sx={{
-                                fontFamily: 'Poppins, sans-serif',
-                                textTransform: 'capitalize',
-                                fontSize: '28px',
-                                fontWeight: 'bold',
-                                color: '#5D6965',
-                                display: 'inline-block'
-                            }}>
-                                {metrics.totalProjects.value}
+                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
+                                {metrics.estimatedYield.value}
                             </Typography>
-                            <Typography sx={{
-                                fontFamily: 'Nunito, Poppins, sans-serif',
-                                fontSize: '16px',
-                                color: '#5D6965',
-                            }} variant="h6">
+                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
                                 Estimated Yield (Kg)
                             </Typography>
-                            <Typography variant="body2" sx={{ color: metrics.totalProjects.positive ? 'green' : 'red', marginTop: 1 }}>
-                                {metrics.totalProjects.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.totalProjects.change}
+                            <Typography variant="body2" sx={{ color: metrics.estimatedYield.positive ? 'green' : 'red', marginTop: 1 }}>
+                                {metrics.estimatedYield.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.estimatedYield.change}
                             </Typography>
                         </Box>
                     </Paper>
                 </Grid>
 
-              
+                {/* Active IOT Devices Card */}
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
-                        <Avatar sx={{ bgcolor: metrics.updatedProjects.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
+                        <Avatar sx={{ bgcolor: metrics.IOTDevices.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <PodcastsIcon />
                         </Avatar>
                         <Box sx={{ textAlign: 'center', flex: 1 }}>
-                            <Typography variant="h4" sx={{
-                                fontFamily: 'Poppins, sans-serif',
-                                textTransform: 'capitalize',
-                                fontSize: '28px',
-                                fontWeight: 'bold',
-                                color: '#5D6965',
-                                display: 'inline-block'
-                            }}>
-                                {metrics.updatedProjects.value}
+                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
+                                {metrics.IOTDevices.value}
                             </Typography>
-                            <Typography sx={{
-                                fontFamily: 'Nunito, Poppins, sans-serif',
-                                fontSize: '16px',
-                                color: '#5D6965',
-                            }} variant="h6">
+                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
                                 Active IOT Devices
                             </Typography>
-                            <Typography variant="body2" sx={{ color: metrics.updatedProjects.positive ? 'green' : 'red', marginTop: 1 }}>
-                                {metrics.updatedProjects.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.updatedProjects.change}
+                            <Typography variant="body2" sx={{ color: metrics.IOTDevices.positive ? 'green' : 'red', marginTop: 1 }}>
+                                {metrics.IOTDevices.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.IOTDevices.change}
                             </Typography>
                         </Box>
                     </Paper>
                 </Grid>
 
-               
+                {/* Valid Period Card */}
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper elevation={3} sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: '16px' }}>
-                        <Avatar sx={{ bgcolor: metrics.totalPending.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
+                        <Avatar sx={{ bgcolor: metrics.validPeriod.positive ? 'success.light' : 'error.light', marginRight: 1 }}>
                             <PendingActionsIcon />
                         </Avatar>
                         <Box sx={{ textAlign: 'center', flex: 1 }}>
-                            <Typography variant="h4" sx={{
-                                fontFamily: 'Poppins, sans-serif',
-                                textTransform: 'capitalize',
-                                fontSize: '28px',
-                                fontWeight: 'bold',
-                                color: '#5D6965',
-                                display: 'inline-block'
-                            }}>
-                                {metrics.totalPending.value}
+                            <Typography variant="h4" sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '28px', fontWeight: 'bold', color: '#5D6965', display: 'inline-block' }}>
+                                {metrics.validPeriod.value}
                             </Typography>
-                            <Typography sx={{
-                                fontFamily: 'Nunito, Poppins, sans-serif',
-                                fontSize: '16px',
-                                color: '#5D6965',
-                            }} variant="h6">
+                            <Typography sx={{ fontFamily: 'Nunito, Poppins, sans-serif', fontSize: '16px', color: '#5D6965' }} variant="h6">
                                 Valid Period
                             </Typography>
-                            <Typography variant="body2" sx={{ color: metrics.totalPending.positive ? 'green' : 'red', marginTop: 1 }}>
-                                {metrics.totalPending.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.totalPending.change}
+                            <Typography variant="body2" sx={{ color: metrics.validPeriod.positive ? 'green' : 'red', marginTop: 1 }}>
+                                {metrics.validPeriod.positive ? <TrendingUpIcon fontSize="small" /> : <TrendingDownIcon fontSize="small" />} {metrics.validPeriod.change}
                             </Typography>
                         </Box>
                     </Paper>
@@ -172,5 +151,3 @@ const Statistics: React.FC = () => {
 };
 
 export default Statistics;
-
-
