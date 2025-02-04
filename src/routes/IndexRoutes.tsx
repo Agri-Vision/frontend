@@ -18,6 +18,7 @@ import { Loading } from "../pages/Loading";
 import CustomerHome from "../pages/CustomerHome";
 import RedirectToRoleBasedHome from "../auth/RedirectToRoleBasedHome";
 import ProtectedRoutes from "../auth/ProtectedRoutes";
+import Unauthorized from "../pages/Unauthorized";
 
 const IndexRoutes: React.FC = () => {
     return (
@@ -63,6 +64,7 @@ const IndexRoutes: React.FC = () => {
 
                 {/* Common routes */}
                 <Route path="/loading" element={<Loading />} />
+                <Route path="unauthorized" element={<Unauthorized />} />
                 <Route path="/NotFoundPage" element={<NotFoundPage />} />
             </Routes>
         </SecureApp >
