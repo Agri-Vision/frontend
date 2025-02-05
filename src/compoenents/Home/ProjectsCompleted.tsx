@@ -28,7 +28,7 @@ const ProjectsCompleted: React.FC = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/project/plantation/2`);
+        const response = await axios.get(`${API_BASE_URL}/project/plantation/1`);
         // Filter projects with status "PENDING"
         const pendingProjects = response.data.filter((project: Project) => project.status === 'COMPLETED');
         setProjects(pendingProjects);

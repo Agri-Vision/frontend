@@ -16,7 +16,7 @@ const Statistics: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/project/plantation/2`);
+                const response = await fetch(`${API_BASE_URL}/project/plantation/1`);
                 const data = await response.json();
 
                 // Extract the necessary counts
